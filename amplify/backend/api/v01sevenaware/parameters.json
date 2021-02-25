@@ -1,5 +1,11 @@
 {
   "AppSyncApiName": "v01sevenaware",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authv01sevenaware84249243",
+      "Outputs.UserPoolId"
+    ]
+  }
 }

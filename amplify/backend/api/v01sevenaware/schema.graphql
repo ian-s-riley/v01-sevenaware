@@ -1,7 +1,42 @@
-type Post @model {
-  id: ID!
-  name: String!
-  location: String!
-  description: String!
-  image: String
-}
+type Form @model 
+  @searchable
+  @auth(rules: [
+    {allow: public}
+  ])   
+  {
+    id: ID!
+    name: String!
+    code: String
+    order: Int!
+    description: String
+    helpCategory: String
+    helpTitle: String
+    helpDescription: String
+    legal: String
+    parentFormId: String!
+    isArray: String
+    isComplete: String
+  }
+
+type Field 	@model 
+  @searchable
+  @auth(rules: [
+    {allow: public}
+  ]) 
+  {
+    id: ID!
+    name: String!
+    code: String
+    description: String
+    fieldType: String
+    order: Int
+    value: String
+    defaultValue: String
+    options: String
+    userId: String
+    lenderId: String
+    label: String
+    helpText: String
+    image: String
+    formId: String! 
+  }

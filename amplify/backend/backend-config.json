@@ -12,7 +12,14 @@
               "description": "v01sevenaware-key"
             }
           },
-          "additionalAuthenticationProviders": []
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+              "userPoolConfig": {
+                "userPoolId": "authv01sevenaware84249243"
+              }
+            }
+          ]
         }
       }
     }

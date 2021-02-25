@@ -1,49 +1,148 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
+export const createForm = /* GraphQL */ `
+  mutation CreateForm(
+    $input: CreateFormInput!
+    $condition: ModelFormConditionInput
   ) {
-    createPost(input: $input, condition: $condition) {
+    createForm(input: $input, condition: $condition) {
       id
       name
-      location
+      code
+      order
       description
-      image
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
+      parentFormId
+      isArray
+      isComplete
       createdAt
       updatedAt
     }
   }
 `;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
+export const updateForm = /* GraphQL */ `
+  mutation UpdateForm(
+    $input: UpdateFormInput!
+    $condition: ModelFormConditionInput
   ) {
-    updatePost(input: $input, condition: $condition) {
+    updateForm(input: $input, condition: $condition) {
       id
       name
-      location
+      code
+      order
       description
-      image
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
+      parentFormId
+      isArray
+      isComplete
       createdAt
       updatedAt
     }
   }
 `;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
+export const deleteForm = /* GraphQL */ `
+  mutation DeleteForm(
+    $input: DeleteFormInput!
+    $condition: ModelFormConditionInput
   ) {
-    deletePost(input: $input, condition: $condition) {
+    deleteForm(input: $input, condition: $condition) {
       id
       name
-      location
+      code
+      order
       description
+      helpCategory
+      helpTitle
+      helpDescription
+      legal
+      parentFormId
+      isArray
+      isComplete
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createField = /* GraphQL */ `
+  mutation CreateField(
+    $input: CreateFieldInput!
+    $condition: ModelFieldConditionInput
+  ) {
+    createField(input: $input, condition: $condition) {
+      id
+      name
+      code
+      description
+      fieldType
+      order
+      value
+      defaultValue
+      options
+      userId
+      lenderId
+      label
+      helpText
       image
+      formId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateField = /* GraphQL */ `
+  mutation UpdateField(
+    $input: UpdateFieldInput!
+    $condition: ModelFieldConditionInput
+  ) {
+    updateField(input: $input, condition: $condition) {
+      id
+      name
+      code
+      description
+      fieldType
+      order
+      value
+      defaultValue
+      options
+      userId
+      lenderId
+      label
+      helpText
+      image
+      formId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteField = /* GraphQL */ `
+  mutation DeleteField(
+    $input: DeleteFieldInput!
+    $condition: ModelFieldConditionInput
+  ) {
+    deleteField(input: $input, condition: $condition) {
+      id
+      name
+      code
+      description
+      fieldType
+      order
+      value
+      defaultValue
+      options
+      userId
+      lenderId
+      label
+      helpText
+      image
+      formId
       createdAt
       updatedAt
     }

@@ -5,6 +5,7 @@ export const getForm = /* GraphQL */ `
   query GetForm($id: ID!) {
     getForm(id: $id) {
       id
+      form
       name
       code
       order
@@ -14,6 +15,7 @@ export const getForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -30,6 +32,7 @@ export const listForms = /* GraphQL */ `
     listForms(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        form
         name
         code
         order
@@ -39,6 +42,7 @@ export const listForms = /* GraphQL */ `
         helpDescription
         legal
         parentFormId
+        parentForm
         isArray
         isComplete
         createdAt
@@ -52,6 +56,7 @@ export const getField = /* GraphQL */ `
   query GetField($id: ID!) {
     getField(id: $id) {
       id
+      field
       name
       code
       description
@@ -66,6 +71,7 @@ export const getField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -80,6 +86,7 @@ export const listFields = /* GraphQL */ `
     listFields(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        field
         name
         code
         description
@@ -94,6 +101,7 @@ export const listFields = /* GraphQL */ `
         helpText
         image
         formId
+        form
         createdAt
         updatedAt
       }
@@ -118,6 +126,7 @@ export const searchForms = /* GraphQL */ `
     ) {
       items {
         id
+        form
         name
         code
         order
@@ -127,6 +136,7 @@ export const searchForms = /* GraphQL */ `
         helpDescription
         legal
         parentFormId
+        parentForm
         isArray
         isComplete
         createdAt
@@ -154,6 +164,7 @@ export const searchFields = /* GraphQL */ `
     ) {
       items {
         id
+        field
         name
         code
         description
@@ -168,6 +179,7 @@ export const searchFields = /* GraphQL */ `
         helpText
         image
         formId
+        form
         createdAt
         updatedAt
       }

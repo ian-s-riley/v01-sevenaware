@@ -60,11 +60,11 @@ export default function SevenAForms() {
     }
     
     function handleSelectForm(id) { 
-      history.push("/admin/formdetail", { formId: id, parentFormId: '-1' }) 
+      history.push("/admin/formdetail", { formId: id, parentFormId: '-1', parentForm: '' }) 
     }    
   
     function handleCreateForm() {    
-      history.push("/admin/formDetail", { formId: '', parentFormId: '-1' })
+      history.push("/admin/formDetail", { formId: '', parentFormId: '-1', parentForm: '' })
     }
   
     function handlePreviewForm({ id }) {    

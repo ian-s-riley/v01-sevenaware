@@ -5,6 +5,7 @@ type Form @model
   ])   
   {
     id: ID!
+    form: String
     name: String!
     code: String
     order: Int!
@@ -14,6 +15,7 @@ type Form @model
     helpDescription: String
     legal: String
     parentFormId: String!
+    parentForm: String
     isArray: String
     isComplete: String
   }
@@ -25,6 +27,7 @@ type Field 	@model
   ]) 
   {
     id: ID!
+    field: String    
     name: String!
     code: String
     description: String
@@ -39,4 +42,5 @@ type Field 	@model
     helpText: String
     image: String
     formId: String! 
+    form: String
   }

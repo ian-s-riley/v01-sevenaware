@@ -69,7 +69,6 @@ export default function FormTemplate() {
     const [subforms, setSubforms] = useState([])
     const [incompleteSubforms, setIncompleteSubforms] = useState([])
     const [siblingForms, setSiblingForms] = useState([])
-    const [nextFormId, setNextFormId] = useState('')
     
 
     useEffect(() => {

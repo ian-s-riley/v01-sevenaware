@@ -5,6 +5,7 @@ export const onCreateForm = /* GraphQL */ `
   subscription OnCreateForm {
     onCreateForm {
       id
+      form
       name
       code
       order
@@ -14,6 +15,7 @@ export const onCreateForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -25,6 +27,7 @@ export const onUpdateForm = /* GraphQL */ `
   subscription OnUpdateForm {
     onUpdateForm {
       id
+      form
       name
       code
       order
@@ -34,6 +37,7 @@ export const onUpdateForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -45,6 +49,7 @@ export const onDeleteForm = /* GraphQL */ `
   subscription OnDeleteForm {
     onDeleteForm {
       id
+      form
       name
       code
       order
@@ -54,6 +59,7 @@ export const onDeleteForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -65,6 +71,7 @@ export const onCreateField = /* GraphQL */ `
   subscription OnCreateField {
     onCreateField {
       id
+      field
       name
       code
       description
@@ -79,6 +86,7 @@ export const onCreateField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -88,6 +96,7 @@ export const onUpdateField = /* GraphQL */ `
   subscription OnUpdateField {
     onUpdateField {
       id
+      field
       name
       code
       description
@@ -102,6 +111,7 @@ export const onUpdateField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -111,6 +121,7 @@ export const onDeleteField = /* GraphQL */ `
   subscription OnDeleteField {
     onDeleteField {
       id
+      field
       name
       code
       description
@@ -125,6 +136,7 @@ export const onDeleteField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }

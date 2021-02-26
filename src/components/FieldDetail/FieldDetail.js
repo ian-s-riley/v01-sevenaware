@@ -26,6 +26,8 @@ import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsS
 const useStyles = makeStyles(styles);
 
 const initialFieldState = { 
+    fieldId: '',
+    field: '',
     name: '',
     code: '',
     description: '',
@@ -98,6 +100,7 @@ export default function FieldDetail() {
                         query: updateFieldMutation, 
                         variables: { input: {
                             id: field.id, 
+                            field: field.field, 
                             name: field.name,
                             code: field.code,
                             description: field.description,
@@ -204,7 +207,7 @@ export default function FieldDetail() {
             />
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={6}>
+          <GridItem xs={12} sm={12} md={4}>
             <CustomInput
               labelText="Default Value"
               id="defaultValue"
@@ -215,6 +218,21 @@ export default function FieldDetail() {
               inputProps={{
                 onChange: (event) => handleChange(event),
                 value: field.defaultValue,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={2}>
+            <CustomInput
+              labelText="Field ID"
+              id="field"
+              name="field"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: field.field,                
               }}                           
             />
           </GridItem>
@@ -252,7 +270,7 @@ export default function FieldDetail() {
           </GridContainer>
                 
         <GridContainer>
-        <GridItem xs={12} sm={12} md={12}>
+        <GridItem xs={12} sm={12} md={10}>
           <CustomInput
               labelText="Description"
               id="description"

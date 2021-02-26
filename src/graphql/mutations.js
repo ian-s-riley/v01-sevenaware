@@ -8,6 +8,7 @@ export const createForm = /* GraphQL */ `
   ) {
     createForm(input: $input, condition: $condition) {
       id
+      form
       name
       code
       order
@@ -17,6 +18,7 @@ export const createForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -31,6 +33,7 @@ export const updateForm = /* GraphQL */ `
   ) {
     updateForm(input: $input, condition: $condition) {
       id
+      form
       name
       code
       order
@@ -40,6 +43,7 @@ export const updateForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -54,6 +58,7 @@ export const deleteForm = /* GraphQL */ `
   ) {
     deleteForm(input: $input, condition: $condition) {
       id
+      form
       name
       code
       order
@@ -63,6 +68,7 @@ export const deleteForm = /* GraphQL */ `
       helpDescription
       legal
       parentFormId
+      parentForm
       isArray
       isComplete
       createdAt
@@ -77,6 +83,7 @@ export const createField = /* GraphQL */ `
   ) {
     createField(input: $input, condition: $condition) {
       id
+      field
       name
       code
       description
@@ -91,6 +98,7 @@ export const createField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -103,6 +111,7 @@ export const updateField = /* GraphQL */ `
   ) {
     updateField(input: $input, condition: $condition) {
       id
+      field
       name
       code
       description
@@ -117,6 +126,7 @@ export const updateField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }
@@ -129,6 +139,7 @@ export const deleteField = /* GraphQL */ `
   ) {
     deleteField(input: $input, condition: $condition) {
       id
+      field
       name
       code
       description
@@ -143,6 +154,7 @@ export const deleteField = /* GraphQL */ `
       helpText
       image
       formId
+      form
       createdAt
       updatedAt
     }

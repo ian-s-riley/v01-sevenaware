@@ -35,6 +35,7 @@ import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsS
 const useStyles = makeStyles(styles);
 
 const initialFormState = { 
+                          form: '',
                           name: '', 
                           code: '', 
                           order: 0, 
@@ -44,6 +45,7 @@ const initialFormState = {
                           helpDescription: '',
                           legal: '',
                           parentFormId:  '-1', 
+                          parentForm: '',
                           isArray: '',
                           isComplete: '' }
 
@@ -54,6 +56,7 @@ export default function FormDetail() {
 
   const formId = history.location.state.formId
   const parentFormId = history.location.state.parentFormId
+  const parentForm = history.location.state.parentForm
   //onsole.log('formId', formId)
   //console.log('parentFormID',parentFormId)
 
@@ -80,7 +83,7 @@ export default function FormDetail() {
 
   async function fetchForm() {
       if (formId === '') {
-          setForm({ ...initialFormState, parentFormId: parentFormId})
+          setForm({ ...initialFormState, parentFormId: parentFormId, parentForm: parentForm})
       } else {
         const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});       
         setForm(formFromAPI.data.getForm )      
@@ -125,6 +128,7 @@ export default function FormDetail() {
                         query: updateFormMutation, 
                         variables: { input: {
                           id: form.id, 
+                          form: form.form, 
                           code: form.code,
                           name: form.name, 
                           order: form.order, 
@@ -166,12 +170,12 @@ export default function FormDetail() {
       history.goBack()   
   }  
 
-  async function handleSelectSubform({ id, parentFormId }) { 
-    history.push("/admin/formdetail", { formId: id, parentFormId: parentFormId }) 
+  async function handleSelectSubform({ id, name, parentFormId, parentForm }) { 
+    history.push("/admin/formdetail", { formId: id, parentFormId: parentFormId, parentForm: parentForm }) 
   }  
 
   function handleCreateSubform() {
-    history.push("/admin/formdetail", { formId: '', parentFormId: formId }) 
+    history.push("/admin/formdetail", { formId: '', parentFormId: formId, parentForm: form.name }) 
   }  
 
   async function handleSelectField({ id }) { 
@@ -200,9 +204,11 @@ export default function FormDetail() {
   return (
     <>
     <Card>
-      <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>Form ID: {form.id}</h4>
-      </CardHeader>
+        <CardHeader color="primary" stats icon>
+            <CardIcon color="Primary">
+            <h4 className={classes.cardTitleWhite}>Subforms</h4>
+            </CardIcon>                                    
+        </CardHeader>
       <CardBody>
       <GridContainer>                    
           <GridItem xs={12} sm={12} md={5}>
@@ -247,20 +253,19 @@ export default function FormDetail() {
             />
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={12}>
+          <GridItem xs={12} sm={12} md={2}>
             <CustomInput
-                labelText="Description"
-                id="description"
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  onChange: (event) => handleChange(event),
-                  value: form.description,
-                  multiline: true,
-                  rows: 4
-                }}
-              />
+              labelText="Form ID"
+              id="form"
+              name="form"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: form.form,                
+              }}                           
+            />
           </GridItem>
         </GridContainer>                   
       </CardBody>      
@@ -366,9 +371,7 @@ export default function FormDetail() {
                 <CardHeader color="warning" stats icon>
                   <CardIcon color="warning">
                     <h4 className={classes.cardTitleWhite}>Subforms</h4>
-                  </CardIcon>
-                  
-                  
+                  </CardIcon>                                    
                 </CardHeader>
                     <CardBody>
                     <Table className={classes.table}>                    

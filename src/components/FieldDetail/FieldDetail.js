@@ -80,8 +80,7 @@ export default function FieldDetail() {
 
   useEffect(() => {
     fetchField()
-    //fetchForms()
-  }, [fieldId])
+  }, [])
 
   async function fetchField() {
       if (fieldId === '') {
@@ -89,35 +88,32 @@ export default function FieldDetail() {
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
-        setField(fieldFromAPI)  
-
-        const fieldType = fieldFromAPI.fieldType
-        if (fieldType === 'TrueFalse' || fieldType === 'DropDown') {
-            setOptionsDisabled(false)
-
-            const fieldOptions = fieldFromAPI.options
-            if (fieldOptions.length > 0) {
-              setOptions(fieldOptions.split(','))
-            } 
-        }        
+        setField(fieldFromAPI)    
+        setupOptions(fieldFromAPI)         
       }
   }  
 
-//   async function fetchForms() {
-//     //need to hook up many to many relationship
-//     const formsFromAPI = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
-//     setFields(formsFromAPI.data.listFields.items);    
-//   }
+  function setupOptions(thisField) {
+    const fieldType = thisField.fieldType
+    if (fieldType === 'DropDown') {
+        setOptionsDisabled(false)
+
+        const fieldOptions = thisField.options
+        if (fieldOptions.length > 0) {
+          setOptions(fieldOptions.split(','))
+        } 
+    }     
+  }
 
   async function createField() {
     if (!field.name || !field.code) return
-    console.log('createField: field', field)
+    //console.log('createField: field', field)
     await API.graphql({ query: createFieldMutation, variables: { input: field } })
     history.goBack()  
   }
 
   async function updateField() {
-    if (!field.name || !field.code) return;          
+    if (!field.name || !field.code) return;    
     await API.graphql({ 
                         query: updateFieldMutation, 
                         variables: { input: {
@@ -168,20 +164,7 @@ export default function FieldDetail() {
     setField({ ...field, [name]: value})
 
     //if a type with options, enable that field
-    if (value === 'TrueFalse' || value === 'DropDown') { setOptionsDisabled(false) } else { setOptionsDisabled(true)}
-    switch(value) {
-      case 'TrueFalse':
-        setOptionsDisabled(false)
-        setOptions(["False", "True"])
-      break
-      case 'DropDown':
-        setOptionsDisabled(false)
-        setOptions(["Option 1", "Option 2"])
-      break
-      default:
-        setOptionsDisabled(true)
-        setOptions([])
-    }
+    if (value === 'DropDown') { setOptionsDisabled(false) } else { setOptionsDisabled(true)}
   }
 
   const handleOptions = regularOptions => {
@@ -535,12 +518,15 @@ export default function FieldDetail() {
 
           <GridItem xs={12} sm={12} md={5}>
           {!optionsDisabled && (
+            <>
+            Options
             <TagsInput
                     value={options}
                     onChange={handleOptions}
                     tagProps={{ className: "react-tagsinput-tag info" }}
                     inputProps={{ placeholder: 'Click to Add'}}
                   />
+            </>
           )}                  
           </GridItem>
           </GridContainer>

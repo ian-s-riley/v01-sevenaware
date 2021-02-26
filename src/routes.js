@@ -28,6 +28,11 @@ import VectorMap from "views/Maps/VectorMap.js";
 import Widgets from "views/Widgets/Widgets.js";
 import Wizard from "views/Forms/Wizard.js";
 
+import SevenAForms from 'views/Forms/SevenAForms'
+import FormTemplate from 'views/FormTemplate/FormTemplate'
+import FormDetail from 'components/FormDetail/FormDetail'
+import FieldDetail from 'components/FieldDetail/FieldDetail'
+
 // @material-ui/icons
 import Apps from "@material-ui/icons/Apps";
 import DashboardIcon from "@material-ui/icons/Dashboard";
@@ -45,6 +50,14 @@ var dashRoutes = [
     rtlName: "لوحة القيادة",
     icon: DashboardIcon,
     component: Dashboard,
+    layout: "/admin"
+  },
+  {
+    path: "/sevenaforms",
+    name: "7(a)ware Forms",
+    rtlName: "لوحة القيادة",
+    icon: "content_paste",
+    component: SevenAForms,
     layout: "/admin"
   },
   {
@@ -306,38 +319,28 @@ var dashRoutes = [
   },
   {
     collapse: true,
-    name: "Maps",
-    rtlName: "خرائط",
-    icon: Place,
+    name: "7(a) Screens",
+    icon: GridOn,
     state: "mapsCollapse",
     views: [
       {
-        path: "/google-maps",
-        name: "Google Maps",
-        rtlName: "خرائط جوجل",
-        mini: "GM",
-        rtlMini: "زم",
-        component: GoogleMaps,
+        path: "/formdetail",
+        name: "Form Detail",
+        component: FormDetail,
         layout: "/admin"
       },
       {
-        path: "/full-screen-maps",
-        name: "Full Screen Map",
-        rtlName: "خريطة كاملة الشاشة",
-        mini: "FSM",
-        rtlMini: "ووم",
-        component: FullScreenMap,
+        path: "/fielddetail",
+        name: "Field Detail",
+        component: FieldDetail,
         layout: "/admin"
       },
       {
-        path: "/vector-maps",
-        name: "Vector Map",
-        rtlName: "خريطة المتجه",
-        mini: "VM",
-        rtlMini: "تم",
-        component: VectorMap,
+        path: "/formtemplate",
+        name: "Form Tempalte",
+        component: FormTemplate,
         layout: "/admin"
-      }
+      },
     ]
   },
   {
@@ -363,6 +366,6 @@ var dashRoutes = [
     icon: DateRange,
     component: Calendar,
     layout: "/admin"
-  }
+  },  
 ];
 export default dashRoutes;

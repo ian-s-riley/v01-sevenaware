@@ -499,9 +499,9 @@ export default function FieldDetail() {
                     root: classes.selectMenuItem,
                     selected: classes.selectMenuItemSelected
                   }}
-                  value="TrueFalse"
+                  value="YesNo"
                 >
-                  TrueFalse
+                  YesNo
                 </MenuItem>  
                 <MenuItem
                   classes={{

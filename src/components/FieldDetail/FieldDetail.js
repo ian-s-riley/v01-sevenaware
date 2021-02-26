@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 
+// react component plugin for creating beatiful tags on an input
+import TagsInput from "react-tagsinput";
+
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
 import { getField } from '../../graphql/queries';
@@ -33,12 +36,11 @@ import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsS
 const useStyles = makeStyles(styles);
 
 const initialFieldState = { 
-    fieldId: '',
     field: '',
     name: '',
     code: '',
     description: '',
-    fieldType: '',
+    fieldType: 'Text',
     order: 0,
     value: '',
     defaultValue: '',
@@ -49,6 +51,7 @@ const initialFieldState = {
     helpText: '',
     image: '',
     formId: '',
+    size: 6,
 }
 
 export default function FieldDetail() {
@@ -62,6 +65,7 @@ export default function FieldDetail() {
 
   const [field, setField] = useState(initialFieldState)
   const [optionsDisabled, setOptionsDisabled] = useState(true)
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -83,8 +87,19 @@ export default function FieldDetail() {
       if (fieldId === '') {
         setField({...initialFieldState, formId: formId})
       } else {
-        const fieldFromAPI = await API.graphql({ query: getField, variables: { id: fieldId  }});       
-        setField(fieldFromAPI.data.getField)  
+        const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
+        const fieldFromAPI = apiData.data.getField
+        setField(fieldFromAPI)  
+
+        const fieldType = fieldFromAPI.fieldType
+        if (fieldType === 'TrueFalse' || fieldType === 'DropDown') {
+            setOptionsDisabled(false)
+
+            const fieldOptions = fieldFromAPI.options
+            if (fieldOptions.length > 0) {
+              setOptions(fieldOptions.split(','))
+            } 
+        }        
       }
   }  
 
@@ -102,7 +117,7 @@ export default function FieldDetail() {
   }
 
   async function updateField() {
-    if (!field.name || !field.code) return;        
+    if (!field.name || !field.code) return;          
     await API.graphql({ 
                         query: updateFieldMutation, 
                         variables: { input: {
@@ -122,6 +137,7 @@ export default function FieldDetail() {
                             helpText: field.helpText,
                             image: field.image,
                             formId: field.formId,
+                            size: field.size,
                         }} 
                     }); 
     //go back to the list or the parent form
@@ -152,7 +168,25 @@ export default function FieldDetail() {
     setField({ ...field, [name]: value})
 
     //if a type with options, enable that field
-    if (value === 'True/False') setOptionsDisabled(false)
+    if (value === 'TrueFalse' || value === 'DropDown') { setOptionsDisabled(false) } else { setOptionsDisabled(true)}
+    switch(value) {
+      case 'TrueFalse':
+        setOptionsDisabled(false)
+        setOptions(["False", "True"])
+      break
+      case 'DropDown':
+        setOptionsDisabled(false)
+        setOptions(["Option 1", "Option 2"])
+      break
+      default:
+        setOptionsDisabled(true)
+        setOptions([])
+    }
+  }
+
+  const handleOptions = regularOptions => {
+    setOptions(regularOptions);
+    setField({ ...field, options: regularOptions.join(',')})
   };
   
   return (
@@ -163,38 +197,7 @@ export default function FieldDetail() {
       <CardBody>
       
       <GridContainer>
-        
-
-            <GridItem xs={12} sm={12} md={6}>
-              <CustomInput
-                labelText="Field Name"
-                id="name"
-                name="name"
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  onChange: (event) => handleChange(event),
-                  value: field.name,                
-                }}                           
-              />
-            </GridItem>
-
-            <GridItem xs={12} sm={12} md={4}>
-            <CustomInput
-                labelText="Code"
-                id="code"
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  onChange: (event) => handleChange(event),
-                  value: field.code,                
-                }}
-              />
-            </GridItem>
-
-            <GridItem xs={12} sm={12} md={2}>
+        <GridItem xs={12} sm={12} md={2}>
             <CustomInput
               labelText="Order"
               id="order"
@@ -209,7 +212,201 @@ export default function FieldDetail() {
             />
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={6}>
+            <GridItem xs={12} sm={12} md={5}>
+              <CustomInput
+                labelText="Field Name"
+                id="name"
+                name="name"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  value: field.name,                
+                }}                           
+              />
+            </GridItem>
+
+            <GridItem xs={12} sm={12} md={5}>
+            <CustomInput
+                labelText="Code"
+                id="code"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  value: field.code,                
+                }}
+              />
+            </GridItem>
+
+            
+            <GridItem xs={12} sm={12} md={2}>
+            <CustomInput
+              labelText="Field ID"
+              id="field"
+              name="field"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: field.field,                
+              }}                           
+            />
+          </GridItem>
+          
+
+            <GridItem xs={12} sm={12} md={5}>
+            <CustomInput
+              labelText="Label/Hover"
+              id="label"
+              name="label"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: field.label,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={5}>
+            <CustomInput
+              labelText="Default Value"
+              id="defaultValue"
+              name="defaultValue"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: field.defaultValue,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={2}>
+            <FormControl
+              fullWidth
+              className={classes.selectFormControl}
+            >
+              <InputLabel
+                htmlFor="field-size"
+                className={classes.selectLabel}
+              >
+                Size
+              </InputLabel>
+              <Select
+                MenuProps={{
+                  className: classes.selectMenu
+                }}
+                classes={{
+                  select: classes.select
+                }}
+                value={field.size}
+                onChange={handleSelectFieldType}
+                inputProps={{
+                  name: "size",
+                  id: "field-size"
+                }}
+              >
+                <MenuItem
+                  disabled
+                  classes={{
+                    root: classes.selectMenuItem
+                  }}
+                >
+                  Select Size
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="2"
+                >
+                  2
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="3"
+                >
+                  3
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="4"
+                >
+                  4
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="5"
+                >
+                  5
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="6"
+                >
+                  6
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="7"
+                >
+                  7
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="9"
+                >
+                  9
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="10"
+                >
+                  10
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="12"
+                >
+                  12
+                </MenuItem>                          
+              </Select>
+            </FormControl>
+          </GridItem>
+          
+          <GridItem xs={12} sm={12} md={5}>
             <FormControl
               fullWidth
               className={classes.selectFormControl}
@@ -319,9 +516,9 @@ export default function FieldDetail() {
                     root: classes.selectMenuItem,
                     selected: classes.selectMenuItemSelected
                   }}
-                  value="True/False"
+                  value="TrueFalse"
                 >
-                  True/False
+                  TrueFalse
                 </MenuItem>  
                 <MenuItem
                   classes={{
@@ -336,76 +533,22 @@ export default function FieldDetail() {
             </FormControl>
           </GridItem>
 
-          <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Options"
-              id="options"
-              name="options"              
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.options,                
-                disabled: (optionsDisabled == null) ? true : optionsDisabled,
-              }}                           
-            />
+          <GridItem xs={12} sm={12} md={5}>
+          {!optionsDisabled && (
+            <TagsInput
+                    value={options}
+                    onChange={handleOptions}
+                    tagProps={{ className: "react-tagsinput-tag info" }}
+                    inputProps={{ placeholder: 'Click to Add'}}
+                  />
+          )}                  
           </GridItem>
-
-            <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Label"
-              id="label"
-              name="label"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.label,                
-              }}                           
-            />
-          </GridItem>
-
-          <GridItem xs={12} sm={12} md={4}>
-            <CustomInput
-              labelText="Default Value"
-              id="defaultValue"
-              name="defaultValue"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.defaultValue,                
-              }}                           
-            />
-          </GridItem>
-
-          <GridItem xs={12} sm={12} md={2}>
-            <CustomInput
-              labelText="Field ID"
-              id="field"
-              name="field"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.field,                
-              }}                           
-            />
-          </GridItem>
-          
-
-          
-
           </GridContainer>
                 
         <GridContainer>
-        <GridItem xs={12} sm={12} md={10}>
+        <GridItem xs={12} sm={12} md={12}>
           <CustomInput
-              labelText="Description"
+              labelText="Description/Help"
               id="description"
               formControlProps={{
                 fullWidth: true

@@ -72,6 +72,7 @@ export const getField = /* GraphQL */ `
       image
       formId
       form
+      size
       createdAt
       updatedAt
     }
@@ -102,6 +103,7 @@ export const listFields = /* GraphQL */ `
         image
         formId
         form
+        size
         createdAt
         updatedAt
       }
@@ -180,6 +182,7 @@ export const searchFields = /* GraphQL */ `
         image
         formId
         form
+        size
         createdAt
         updatedAt
       }

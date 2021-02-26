@@ -99,6 +99,7 @@ export const createField = /* GraphQL */ `
       image
       formId
       form
+      size
       createdAt
       updatedAt
     }
@@ -127,6 +128,7 @@ export const updateField = /* GraphQL */ `
       image
       formId
       form
+      size
       createdAt
       updatedAt
     }
@@ -155,6 +157,7 @@ export const deleteField = /* GraphQL */ `
       image
       formId
       form
+      size
       createdAt
       updatedAt
     }

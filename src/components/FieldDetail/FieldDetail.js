@@ -21,6 +21,13 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import InputLabel from "@material-ui/core/InputLabel";
+import Switch from "@material-ui/core/Switch";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
 const useStyles = makeStyles(styles);
@@ -54,7 +61,7 @@ export default function FieldDetail() {
   //console.log('formId',formId)
 
   const [field, setField] = useState(initialFieldState)
-  //const [forms, setForms] = useState([])  
+  const [optionsDisabled, setOptionsDisabled] = useState(true)
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -137,6 +144,16 @@ export default function FieldDetail() {
   function handleCancel() {
       history.goBack()   
   }  
+
+  const handleSelectFieldType = event => {
+    const {name, value} = event.target;
+    console.log('name', name)
+    console.log('value', value)
+    setField({ ...field, [name]: value})
+
+    //if a type with options, enable that field
+    if (value === 'True/False') setOptionsDisabled(false)
+  };
   
   return (
     <Card>
@@ -192,6 +209,149 @@ export default function FieldDetail() {
             />
           </GridItem>
 
+          <GridItem xs={12} sm={12} md={6}>
+            <FormControl
+              fullWidth
+              className={classes.selectFormControl}
+            >
+              <InputLabel
+                htmlFor="field-type"
+                className={classes.selectLabel}
+              >
+                Field Type
+              </InputLabel>
+              <Select
+                MenuProps={{
+                  className: classes.selectMenu
+                }}
+                classes={{
+                  select: classes.select
+                }}
+                value={field.fieldType}
+                onChange={handleSelectFieldType}
+                inputProps={{
+                  name: "fieldType",
+                  id: "field-type"
+                }}
+              >
+                <MenuItem
+                  disabled
+                  classes={{
+                    root: classes.selectMenuItem
+                  }}
+                >
+                  Select Field Type
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Text"
+                >
+                  Text
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="TextArea"
+                >
+                  TextArea
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Number"
+                >
+                  Number
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Currency"
+                >
+                  Currency
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Decimal"
+                >
+                  Decimal
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Date"
+                >
+                  Date
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="DateTime"
+                >
+                  DateTime
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="DropDown"
+                >
+                  DropDown
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="True/False"
+                >
+                  True/False
+                </MenuItem>  
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Label"
+                >
+                  Label
+                </MenuItem>                          
+              </Select>
+            </FormControl>
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Options"
+              id="options"
+              name="options"              
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: field.options,                
+                disabled: (optionsDisabled == null) ? true : optionsDisabled,
+              }}                           
+            />
+          </GridItem>
+
             <GridItem xs={12} sm={12} md={6}>
             <CustomInput
               labelText="Label"
@@ -236,36 +396,9 @@ export default function FieldDetail() {
               }}                           
             />
           </GridItem>
+          
 
-            <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Field Type"
-              id="fieldType"
-              name="fieldType"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.fieldType,                
-              }}                           
-            />
-          </GridItem>
-
-          <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Options"
-              id="options"
-              name="options"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.options,                
-              }}                           
-            />
-          </GridItem>
+          
 
           </GridContainer>
                 

@@ -205,7 +205,7 @@ export default function FormDetail() {
     <>
     <Card>
         <CardHeader color="primary" stats icon>
-            <CardIcon color="Primary">
+            <CardIcon color="primary">
             <h4 className={classes.cardTitleWhite}>Subforms</h4>
             </CardIcon>                                    
         </CardHeader>

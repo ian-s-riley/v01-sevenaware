@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
 import { searchForms } from '../../graphql/queries';
+import { deleteForm as deleteFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -60,15 +61,24 @@ export default function SevenAForms() {
     }
     
     function handleSelectForm(id) { 
-      history.push("/admin/formdetail", { formId: id, parentFormId: '-1', parentForm: '' }) 
+      history.push("/admin/formdetail", { formId: id }) 
     }    
   
     function handleCreateForm() {    
-      history.push("/admin/formDetail", { formId: '', parentFormId: '-1', parentForm: '' })
+      history.push("/admin/formDetail", { formId: '', newFormParentId: '-1' })
     }
   
     function handlePreviewForm({ id }) {    
       history.push("/admin/formtemplate", { formId: id })
+    }
+
+    async function handleDeleteForm({ id }) {
+      var result = confirm("Are you sure you want to delete this form?");
+      if (result) {      
+        await API.graphql({ query: deleteFormMutation, variables: { input: { id } }})
+        const newFormsArray = forms.filter(form => form.id !== id)
+        setForms(newFormsArray)  
+      }        
     }
     
     return (
@@ -97,6 +107,7 @@ export default function SevenAForms() {
                       <CardBody>
                           <Button color="success" onClick={() => handleSelectForm(form.id)}>Edit Form</Button>
                           <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
+                          <Button color="danger" onClick={() => handleDeleteForm(form)}>Delete</Button>
                       </CardBody>
                       <CardFooter stats>
                         <div className={classes.stats}>

@@ -7,12 +7,14 @@ import classnames from "classnames";
 import { API, graphqlOperation } from 'aws-amplify';
 import { searchForms, getForm, searchFields } from '../../graphql/queries';
 import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation, deleteField as deleteFieldMutation } from '../../graphql/mutations';
+//import { onCreateField, onUpdateField } from "../../graphql/subscriptions";
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import { TableRow, TableCell } from '@material-ui/core';
+import Icon from "@material-ui/core/Icon";
 
 // @material-ui/icons
 import Add from "@material-ui/icons/AddCircle";
@@ -32,6 +34,7 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
+import { createHashHistory } from 'history';
 const useStyles = makeStyles(styles);
 
 const initialFormState = { 
@@ -54,12 +57,8 @@ export default function FormDetail() {
   const classes = useStyles();
   const tableCellClasses = classnames(classes.tableCell);
 
-  const formId = history.location.state.formId
-  const parentFormId = history.location.state.parentFormId
-  const parentForm = history.location.state.parentForm
-  //onsole.log('formId', formId)
-  //console.log('parentFormID',parentFormId)
-
+  const [formId, setFormId] = useState(history.location.state.formId)
+  const [newFormParentId, setNewFormParentId] = useState(history.location.state.newFormParentId)
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
   const [fields, setFields] = useState([])  
@@ -76,17 +75,29 @@ export default function FormDetail() {
   });
 
   useEffect(() => {
-    fetchForm()
+    fetchForm()    
     fetchSubforms()
     fetchFields()
   }, [formId])
 
+  // useEffect(() => {
+  //   const fieldSubscription = subscribeCreateField();
+  //   return () => fieldSubscription();
+  // }, [])
+
+  // useEffect(() => {
+  //   const fieldSubscription = subscribeUpdateField();
+  //   return () => fieldSubscription();
+  // }, [])
+
   async function fetchForm() {
       if (formId === '') {
-          setForm({ ...initialFormState, parentFormId: parentFormId, parentForm: parentForm})
+          //new form, get the parent form we will use
+          setForm({ ...initialFormState, parentFormId: newFormParentId })
       } else {
+        console.log('fetchForm: formId', formId)
         const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});       
-        setForm(formFromAPI.data.getForm )      
+        setForm(formFromAPI.data.getForm)      
       }
   }  
 
@@ -116,14 +127,49 @@ export default function FormDetail() {
     setFields(fieldsFromAPI);  
   }
 
+  // function subscribeCreateField() {
+  //   const subscription = API.graphql(graphqlOperation(onCreateField))
+  //     .subscribe({
+  //       next: eventData => {
+  //         const data = eventData.value.data.onCreateField
+  //         console.log('data: ', data)
+  //         const newFields = [
+  //           ...fields.filter(f => f.id !== data.id),
+  //           data
+  //         ]
+  //         setFields(newFields)
+  //       }
+  //     })
+  //     return () => subscription.unsubscribe();
+  // }
+
+  // function subscribeUpdateField() {
+  //   console.log('subscribeUpdateField')
+  //   const subscription = API.graphql(graphqlOperation(onUpdateField))
+  //     .subscribe({
+  //       next: eventData => {
+  //         const data = eventData.value.data.onUpdateField
+  //         console.log('data: ', data)
+  //         const newFields = [
+  //           ...fields.filter(f => f.id !== data.id),
+  //           data
+  //         ]
+  //         setFields(newFields)
+  //       }
+  //     })
+  //     return () => subscription.unsubscribe();
+  // }
+
   async function createForm() {
     if (!form.name || !form.code) return    
-    await API.graphql({ query: createFormMutation, variables: { input: form } })
-    history.goBack()  
+    const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
+    const formFromAPI = apiData.data.createForm
+    setNewFormParentId('')
+    setFormId(formFromAPI.id)
   }
 
   async function updateForm() {
-    if (!form.name || !form.code) return;       
+    if (!form.name || !form.code) return     
     await API.graphql({ 
                         query: updateFormMutation, 
                         variables: { input: {
@@ -137,20 +183,9 @@ export default function FormDetail() {
                           helpTitle: form.helpTitle,
                           helpDescription: form.helpDescription,
                           legal: form.legal,
-                          parentFormId: form.parentFormId,
                         }} 
-                      });
-    //go back to the list or the parent form
-    history.goBack()
-  }
-
-  async function handleDeleteForm({ id }) {
-    var result = confirm("Are you sure you want to delete this form?");
-    if (result) {      
-      await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
-      history.goBack()
-    }        
-  }
+                      });  
+  }  
 
   async function handleDeleteSubform({ id }) {
     var result = confirm("Are you sure you want to delete this subform?");
@@ -167,23 +202,25 @@ export default function FormDetail() {
   }
 
   function handleCancel() {
-      history.goBack()   
+    form.parentFormId === '-1' ? history.push("/admin/sevenaforms") : setFormId(form.parentFormId)
   }  
 
-  async function handleSelectSubform({ id, name, parentFormId, parentForm }) { 
-    history.push("/admin/formdetail", { formId: id, parentFormId: parentFormId, parentForm: parentForm }) 
+  async function handleSelectSubform({ id }) { 
+    //history.push("/admin/formdetail", { formId: id }) 
+    setFormId(id)
   }  
 
   function handleCreateSubform() {
-    history.push("/admin/formdetail", { formId: '', parentFormId: formId, parentForm: form.name }) 
+    setNewFormParentId(formId)
+    setFormId('')
   }  
 
   async function handleSelectField({ id }) { 
-    history.push("/admin/fielddetail", { fieldId: id, formId: formId }) 
+    history.push("/admin/fielddetail", { fieldId: id }) 
   }  
 
   function handleCreateField() {
-    history.push("/admin/fielddetail", { fieldId: '', formId: formId }) 
+    history.push("/admin/fielddetail", { fieldId: '', newFieldFormId: formId }) 
   }  
 
   async function handleDeleteField({ id }) {
@@ -191,8 +228,7 @@ export default function FormDetail() {
     if (result) {      
       await API.graphql({ query: deleteFieldMutation, variables: { input: { id } }})
       const newFieldsArray = fields.filter(field => field.id !== id)
-      setFields(newFieldsArray)
-      
+      setFields(newFieldsArray)      
     }        
   }
 
@@ -204,11 +240,13 @@ export default function FormDetail() {
   return (
     <>
     <Card>
-        <CardHeader color="primary" stats icon>
-            <CardIcon color="primary">
-            <h4 className={classes.cardTitleWhite}>Subforms</h4>
-            </CardIcon>                                    
-        </CardHeader>
+      <CardHeader color="primary" stats icon>
+        <CardIcon color="primary">
+          <Icon>info_outline</Icon>
+        </CardIcon>
+        <h5 className={classes.cardTitle}>ID: {formId}</h5>
+        <p className={classes.cardTitle}>Parent ID: {form.parentFormId}</p>
+      </CardHeader>
       <CardBody>
       <GridContainer>                    
           <GridItem xs={12} sm={12} md={5}>
@@ -341,7 +379,7 @@ export default function FormDetail() {
         </GridContainer>         
       </CardBody>
       <CardFooter>
-        <Button onClick={handleCancel}>Cancel</Button>        
+        <Button onClick={handleCancel}>Done</Button>        
         {
         formId === '' ? (
         <Button 
@@ -349,14 +387,10 @@ export default function FormDetail() {
           color="success"
         >Save New Form</Button>
         ) : (
-          <>
           <Button 
             onClick={updateForm}
             color="success"
           >Save</Button>
-          <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
-          <Button color="danger" onClick={() => handleDeleteForm(form)}>Delete</Button>
-          </>
         )
         }                
       </CardFooter>

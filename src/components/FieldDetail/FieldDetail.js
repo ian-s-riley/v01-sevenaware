@@ -5,6 +5,9 @@ import { useHistory } from "react-router-dom";
 // react component plugin for creating beatiful tags on an input
 import TagsInput from "react-tagsinput";
 
+// react component used to create sweet alerts
+import SweetAlert from "react-bootstrap-sweetalert";
+
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
 import { getField } from '../../graphql/queries';
@@ -12,6 +15,7 @@ import { createField as createFieldMutation, deleteField as deleteFieldMutation,
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
+import Icon from "@material-ui/core/Icon";
 
 // @material-ui/icons
 
@@ -22,18 +26,19 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
+import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import InputLabel from "@material-ui/core/InputLabel";
-import Switch from "@material-ui/core/Switch";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
 const useStyles = makeStyles(styles);
+
+import alertStyles from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.js";
+const useAlertStyles = makeStyles(alertStyles);
 
 const initialFieldState = { 
     field: '',
@@ -57,15 +62,16 @@ const initialFieldState = {
 export default function FieldDetail() {
   const history = useHistory();
   const classes = useStyles();
+  const alertClasses = useAlertStyles();
 
-  const fieldId = history.location.state.fieldId
-  const formId = history.location.state.formId
-  //console.log('fieldId', fieldId)
-  //console.log('formId',formId)
+  const [fieldId, setFieldId] = useState(history.location.state.fieldId)
+  const [newFieldFormId, setNewFieldFormId] = useState(history.location.state.newFieldFormId)
 
   const [field, setField] = useState(initialFieldState)
   const [optionsDisabled, setOptionsDisabled] = useState(true)
   const [options, setOptions] = useState([])
+  const [isDirty, setIsDirty] = useState(false)
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -84,7 +90,7 @@ export default function FieldDetail() {
 
   async function fetchField() {
       if (fieldId === '') {
-        setField({...initialFieldState, formId: formId})
+        setField({...initialFieldState, formId: newFieldFormId})
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
@@ -105,11 +111,22 @@ export default function FieldDetail() {
     }     
   }
 
+  function handleSaveClick() {
+    if (field.id === '') {
+      createField()
+    } else {
+      updateField()
+    }
+  }
+
   async function createField() {
     if (!field.name || !field.code) return
     //console.log('createField: field', field)
-    await API.graphql({ query: createFieldMutation, variables: { input: field } })
-    history.goBack()  
+    const apiData = await API.graphql({ query: createFieldMutation, variables: { input: field } })
+    const fieldFromAPI = apiData.data.createField
+    setNewFieldFormId('')
+    setIsDirty(false)
+    setFieldId(fieldFromAPI.id) 
   }
 
   async function updateField() {
@@ -136,20 +153,12 @@ export default function FieldDetail() {
                             size: field.size,
                         }} 
                     }); 
-    //go back to the list or the parent form
-    history.goBack()
-  }
-
-  async function deleteField({ id }) {
-    var result = confirm("Are you sure you want to delete this field?");
-    if (result) {      
-      await API.graphql({ query: deleteFieldMutation, variables: { input: { id } }});
-      history.goBack()
-    }        
-  }
+    setIsDirty(false)
+  }  
 
   function handleChange(e) {
       const {id, value} = e.currentTarget;
+      setIsDirty(true)
       setField({ ...field, [id]: value})      
   }
 
@@ -159,8 +168,7 @@ export default function FieldDetail() {
 
   const handleSelectFieldType = event => {
     const {name, value} = event.target;
-    console.log('name', name)
-    console.log('value', value)
+    setIsDirty(true)
     setField({ ...field, [name]: value})
 
     //if a type with options, enable that field
@@ -168,14 +176,46 @@ export default function FieldDetail() {
   }
 
   const handleOptions = regularOptions => {
+    setIsDirty(true)
     setOptions(regularOptions);
     setField({ ...field, options: regularOptions.join(',')})
   };
+
+  const basicAlert = () => {
+    setAlert(
+      <SweetAlert
+        style={{ display: "block", marginTop: "-100px" }}
+        title="Here's a message!"
+        onConfirm={() => hideAlert()}
+        onCancel={() => hideAlert()}
+        confirmBtnCssClass={classes.button + " " + classes.success}
+      />
+    );
+  };
+
+  const saveButton = (
+      isDirty ? (
+      <Button 
+        onClick={handleSaveClick}
+        color="success"
+      >{field.id === '' ? 'Create New Field' : 'Save'}</Button>
+      ) : (
+        <Button 
+        onClick={handleSaveClick}
+        color="success"
+        disabled
+      >{field.id === '' ? 'Create New Field' : 'Save'}</Button>
+      )
+  )
   
   return (
     <Card>
-      <CardHeader color="warning">
-        <h4 className={classes.cardTitleWhite}>Field ID: {field.id}</h4>
+      <CardHeader color="info" stats icon>
+        <CardIcon color="info">
+          <Icon>info_outline</Icon>
+        </CardIcon>
+        <h5 className={classes.cardTitle}>ID: {fieldId}</h5>
+        <p className={classes.cardTitle}>Parent ID: {field.formId}</p>
       </CardHeader>
       <CardBody>
       
@@ -550,23 +590,8 @@ export default function FieldDetail() {
         </GridContainer>
       </CardBody>
       <CardFooter>
-        <Button onClick={handleCancel}>Cancel</Button>        
-        {
-        fieldId === '' ? (
-        <Button 
-          onClick={createField}
-          color="success"
-        >Create New Field</Button>
-        ) : (
-          <>  
-          <Button 
-            onClick={updateField}
-            color="success"
-          >Save</Button>
-          <Button color="danger" onClick={() => deleteField(field)}>Delete</Button>
-          </>
-        )
-        }        
+        <Button onClick={handleCancel}>Done</Button>        
+        {saveButton}      
       </CardFooter>
     </Card>
   )

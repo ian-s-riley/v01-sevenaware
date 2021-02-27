@@ -5,9 +5,6 @@ import { useHistory } from "react-router-dom";
 // react component plugin for creating beatiful tags on an input
 import TagsInput from "react-tagsinput";
 
-// react component used to create sweet alerts
-import SweetAlert from "react-bootstrap-sweetalert";
-
 //AWS Amplify GraphQL libraries
 import { API } from 'aws-amplify';
 import { getField } from '../../graphql/queries';
@@ -37,9 +34,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
 const useStyles = makeStyles(styles);
 
-import alertStyles from "assets/jss/material-dashboard-pro-react/views/sweetAlertStyle.js";
-const useAlertStyles = makeStyles(alertStyles);
-
 const initialFieldState = { 
     field: '',
     name: '',
@@ -62,16 +56,17 @@ const initialFieldState = {
 export default function FieldDetail() {
   const history = useHistory();
   const classes = useStyles();
-  const alertClasses = useAlertStyles();
 
   const [fieldId, setFieldId] = useState(history.location.state.fieldId)
   const [newFieldFormId, setNewFieldFormId] = useState(history.location.state.newFieldFormId)
+  //console.log('fieldId', fieldId)
+  //console.log('newFieldFormId', newFieldFormId)
+
 
   const [field, setField] = useState(initialFieldState)
   const [optionsDisabled, setOptionsDisabled] = useState(true)
   const [options, setOptions] = useState([])
   const [isDirty, setIsDirty] = useState(false)
-  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -112,7 +107,8 @@ export default function FieldDetail() {
   }
 
   function handleSaveClick() {
-    if (field.id === '') {
+    console.log('handle save click - fieldId', fieldId)
+    if (fieldId === '') {
       createField()
     } else {
       updateField()
@@ -121,7 +117,7 @@ export default function FieldDetail() {
 
   async function createField() {
     if (!field.name || !field.code) return
-    //console.log('createField: field', field)
+    console.log('createField: field', field)
     const apiData = await API.graphql({ query: createFieldMutation, variables: { input: field } })
     const fieldFromAPI = apiData.data.createField
     setNewFieldFormId('')
@@ -131,6 +127,7 @@ export default function FieldDetail() {
 
   async function updateField() {
     if (!field.name || !field.code) return;    
+    console.log('udpateField: field', field)
     await API.graphql({ 
                         query: updateFieldMutation, 
                         variables: { input: {
@@ -179,18 +176,6 @@ export default function FieldDetail() {
     setIsDirty(true)
     setOptions(regularOptions);
     setField({ ...field, options: regularOptions.join(',')})
-  };
-
-  const basicAlert = () => {
-    setAlert(
-      <SweetAlert
-        style={{ display: "block", marginTop: "-100px" }}
-        title="Here's a message!"
-        onConfirm={() => hideAlert()}
-        onCancel={() => hideAlert()}
-        confirmBtnCssClass={classes.button + " " + classes.success}
-      />
-    );
   };
 
   const saveButton = (

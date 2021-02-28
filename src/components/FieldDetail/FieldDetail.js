@@ -107,7 +107,7 @@ export default function FieldDetail() {
   }
 
   function handleSaveClick() {
-    console.log('handle save click - fieldId', fieldId)
+    //console.log('handle save click - fieldId', fieldId)
     if (fieldId === '') {
       createField()
     } else {
@@ -388,6 +388,15 @@ export default function FieldDetail() {
                     root: classes.selectMenuItem,
                     selected: classes.selectMenuItemSelected
                   }}
+                  value="8"
+                >
+                  8
+                </MenuItem> 
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
                   value="9"
                 >
                   9
@@ -455,6 +464,15 @@ export default function FieldDetail() {
                   value="Text"
                 >
                   Text
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value="Email"
+                >
+                  Email
                 </MenuItem>
                 <MenuItem
                   classes={{

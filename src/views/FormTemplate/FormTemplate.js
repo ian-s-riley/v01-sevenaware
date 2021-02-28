@@ -25,7 +25,7 @@ import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import FixedHelp from "components/FixedHelp/FixedHelp";
-import Field from 'components/Field/Field'
+import SevenAField from 'components/SevenAField/SevenAField'
 
 // @material-ui/icons
 import Edit from "@material-ui/icons/Edit";
@@ -208,15 +208,7 @@ export default function FormTemplate() {
               <GridContainer>
               {
                   fields.map(field => (
-                    <Field
-                      id={field.id}
-                      name={field.name}
-                      description={field.description}
-                      value={field.value}
-                      disabled={false}
-                      md={6}
-                      key={field.id}
-                    />
+                    <SevenAField key={field.id} field={field} />
                   ))
                 }                   
               </GridContainer>        

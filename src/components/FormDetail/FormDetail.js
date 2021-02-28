@@ -232,11 +232,6 @@ export default function FormDetail() {
     }        
   }
 
-  async function handlePreviewForm({ id }) {
-    //console.log('name', name)      
-    history.push("/admin/formtemplate", { formId: id })
-  }
-  
   return (
     <>
     <Card>
@@ -430,14 +425,6 @@ export default function FormDetail() {
                           <TableRow className={classes.tableRow} key={subform.id}>
                             <TableCell className={tableCellClasses}>
                                 <>
-                                <Button
-                                  onClick={() => handlePreviewForm(subform)}
-                                  justIcon
-                                  color="info"
-                                  className={classes.marginRight}
-                                >
-                                  <Find className={classes.icons} />
-                                </Button>
                                 <Button
                                   onClick={() => handleSelectSubform(subform)}
                                   justIcon

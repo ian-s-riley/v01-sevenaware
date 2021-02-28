@@ -13,6 +13,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import InputLabel from "@material-ui/core/InputLabel";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Switch from "@material-ui/core/Switch";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 // material ui icons
 import Close from "@material-ui/icons/Close";
@@ -25,7 +27,7 @@ export default function SevenAField(props) {
 
     const field = props.field 
     const size = field.size  
-    console.log(field.fieldType)
+    const options = field.options.split(',')
 
     const [email, setEmail] = useState("");
     const [emailState, setEmailState] = useState("")
@@ -40,6 +42,8 @@ export default function SevenAField(props) {
     const [decimalState, setDecimalState] = useState("")
 
     const [yes, setYes] = useState(true);
+    const [simpleSelect, setSimpleSelect] = useState("");
+    
 
     // function that returns true if value is email, false otherwise
     const verifyEmail = value => {
@@ -76,6 +80,10 @@ export default function SevenAField(props) {
         }
         return false;
     };    
+
+    const handleSimple = event => {
+        setSimpleSelect(event.target.value);
+    };
 
     let thisField = null  
     switch (field.fieldType) {        
@@ -285,7 +293,59 @@ export default function SevenAField(props) {
             )
             break;
         case 'DropDown':
-            console.log('Drop Down Field')
+            console.log('Drop Down Field', field.options)
+            thisField = (
+                <GridItem xs={12} sm={12} md={size}>
+                    <FormControl
+                    fullWidth
+                    className={classes.selectFormControl}
+                    >
+                    <InputLabel
+                        htmlFor={field.id}
+                        className={classes.selectLabel}
+                    >
+                        {field.name}
+                    </InputLabel>
+                    <Select
+                        MenuProps={{
+                        className: classes.selectMenu
+                        }}
+                        classes={{
+                        select: classes.select
+                        }}
+                        value={simpleSelect}
+                        onChange={handleSimple}
+                        inputProps={{
+                            name: field.name,
+                            id: field.id
+                        }}
+                    >
+                        <MenuItem
+                        disabled
+                        classes={{
+                            root: classes.selectMenuItem
+                        }}
+                        >
+                        Select {field.name}
+                        </MenuItem>
+                        {
+                        options.map(option => (
+                            <MenuItem
+                                key={option}
+                                classes={{
+                                    root: classes.selectMenuItem,
+                                    selected: classes.selectMenuItemSelected
+                                }}
+                                value={option}
+                            >
+                            {option}
+                            </MenuItem> 
+                        ))
+                        }                                                    
+                    </Select>
+                    </FormControl>
+                </GridItem>
+            )
             break
         default:
             thisField = (

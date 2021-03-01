@@ -14,6 +14,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Checkbox from "@material-ui/core/Checkbox";
+import NavPills from "components/NavPills/NavPills.js";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -29,8 +30,11 @@ import SevenAField from 'components/SevenAField/SevenAField'
 
 // @material-ui/icons
 import Edit from "@material-ui/icons/Edit";
-import Close from "@material-ui/icons/Close";
 import Check from "@material-ui/icons/Check";
+import Info from "@material-ui/icons/Info";
+import LocationOn from "@material-ui/icons/LocationOn";
+import Gavel from "@material-ui/icons/Gavel";
+import HelpOutline from "@material-ui/icons/HelpOutline";
 
 import avatar from "assets/img/help/form-help-icon-01.png";
 
@@ -198,7 +202,7 @@ export default function FormTemplate() {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={8}>
+        <GridItem xs={12} sm={12} md={12}>
           <Card>
             <CardHeader color="primary">
               <h4 className={classes.cardTitleWhite}>{form.name}</h4>
@@ -219,13 +223,41 @@ export default function FormTemplate() {
               <Button color="info" onClick={handleNextClick}>Next</Button>
             </CardFooter>
           </Card>
-          <GridContainer>
-          <GridItem xs={12} sm={12} md={12}>
-                <Card>
+        </GridItem>
+      </GridContainer>
+
+        <GridContainer justify="center">
+        <GridItem xs={12} sm={12} md={12}>
+          <NavPills
+            color="warning"
+            alignCenter
+            tabs={[
+              {
+                tabButton: "Help Center",
+                tabIcon: HelpOutline,
+                tabContent: (
+                  <Card>
+                    <CardHeader>
+                      <h4 className={classes.cardTitle}>{form.helpCategory}</h4>
+                      <p className={classes.cardCategory}>
+                        {form.helpTitle}
+                      </p>
+                    </CardHeader>
+                    <CardBody>
+                      {form.helpDescription}
+                    </CardBody>
+                  </Card>
+                )
+              },
+              {
+                tabButton: "More Info",
+                tabIcon: Info,
+                tabContent: (
+                  <Card>
                     <CardHeader color="warning">
-                    <h4 className={classes.cardTitleWhite}>Subforms</h4>
+                    <h4 className={classes.cardTitleWhite}>Application Process</h4>
                     <p className={classes.cardCategoryWhite}>
-                        We'll continue your appliction by getting more information.
+                        A quick preview of more info we'll need to collect:
                     </p>
                     </CardHeader>
                     <CardBody>
@@ -264,34 +296,23 @@ export default function FormTemplate() {
                     </Table>                      
                     </CardBody>
                 </Card>
-            </GridItem>
-        </GridContainer>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card profile>
-            <CardAvatar profile>
-              <a href="#pablo" onClick={e => e.preventDefault()}>
-                <img src={avatar} alt="..." />
-              </a>
-            </CardAvatar>
-            <CardBody profile>
-              <h6 className={classes.cardCategory}>{form.helpCategory}</h6>
-              <h4 className={classes.cardTitle}>{form.helpTitle}</h4>
-              <p className={classes.description}>
-                {form.helpDescription}
-              </p>
-              <Button color="success" round>
-                more...
-              </Button>
-            </CardBody>
-          </Card>
+                )
+              },
+              {
+                tabButton: "Legal Info",
+                tabIcon: Gavel,
+                tabContent: (
+                  <Card>
+                    <CardBody>
+                      {form.legal}
+                    </CardBody>
+                  </Card>
+                )
+              },              
+            ]}
+          />
         </GridItem>
       </GridContainer>
-      <FixedHelp
-          legal={form.legal}
-          handleFixedClick={handleFixedClick}
-          fixedClasses={fixedClasses}
-        />
     </div>
   );
 }

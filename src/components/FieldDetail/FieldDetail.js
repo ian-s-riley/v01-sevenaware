@@ -6,15 +6,22 @@ import { useHistory } from "react-router-dom";
 import TagsInput from "react-tagsinput";
 
 //AWS Amplify GraphQL libraries
-import { API } from 'aws-amplify';
+import { API, graphqlOperation } from 'aws-amplify';
 import { getField } from '../../graphql/queries';
-import { createField as createFieldMutation, deleteField as deleteFieldMutation, updateField as updateFieldMutation } from '../../graphql/mutations';
+import { 
+  createField as createFieldMutation, 
+  createFieldFormJoin as createFieldFormJoinMutation, 
+  deleteField as deleteFieldMutation, 
+  deleteFieldFormJoin as deleteFieldFormJoinMutation,
+  updateField as updateFieldMutation,
+} from '../../graphql/mutations';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 import Icon from "@material-ui/core/Icon";
 
 // @material-ui/icons
+import Cancel from "@material-ui/icons/Cancel";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -35,12 +42,12 @@ import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsS
 const useStyles = makeStyles(styles);
 
 const initialFieldState = { 
-    field: '',
     name: '',
+    order: 10,
     code: '',
+    ref: '',
     description: '',
-    fieldType: 'Text',
-    order: 0,
+    fieldType: 'Text',	
     value: '',
     defaultValue: '',
     options: '',
@@ -49,7 +56,7 @@ const initialFieldState = {
     label: '',
     helpText: '',
     image: '',
-    formId: '',
+    dox: '',
     size: 6,
 }
 
@@ -85,7 +92,7 @@ export default function FieldDetail() {
 
   async function fetchField() {
       if (fieldId === '') {
-        setField({...initialFieldState, formId: newFieldFormId})
+        setField({...initialFieldState})
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
@@ -120,6 +127,14 @@ export default function FieldDetail() {
     console.log('createField: field', field)
     const apiData = await API.graphql({ query: createFieldMutation, variables: { input: field } })
     const fieldFromAPI = apiData.data.createField
+
+    await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+      input:{
+        FormID: newFieldFormId, 
+        FieldID: fieldFromAPI.id
+      }
+    })) 
+
     setNewFieldFormId('')
     setIsDirty(false)
     setFieldId(fieldFromAPI.id) 
@@ -127,31 +142,43 @@ export default function FieldDetail() {
 
   async function updateField() {
     if (!field.name || !field.code) return;    
-    console.log('udpateField: field', field)
+    //console.log('udpateField: field', field)
     await API.graphql({ 
                         query: updateFieldMutation, 
                         variables: { input: {
                             id: field.id, 
-                            field: field.field, 
                             name: field.name,
-                            code: field.code,
-                            description: field.description,
-                            fieldType: field.fieldType,
                             order: field.order,
+                            code: field.code,
+                            ref: field.ref,
+                            description: field.description,
+                            fieldType: field.fieldType,	
                             value: field.value,
                             defaultValue: field.defaultValue,
                             options: field.options,
-                            userId: field.userId,
-                            lenderId: field.lenderId,
                             label: field.label,
                             helpText: field.helpText,
                             image: field.image,
-                            formId: field.formId,
+                            dox: field.dox,
                             size: field.size,
                         }} 
                     }); 
     setIsDirty(false)
   }  
+
+  async function handleDeleteField() {
+    // console.log('delete - field', field)
+    // console.log('delete - form join id', field.Form.items[0].id)    
+    // console.log('delete - parent form id', field.Form.items[0].FormID)   
+    var result = confirm("Are you sure you want to delete this field?");
+    if (result) {      
+      const formJoinToDelete = field.Form.items[0].id
+      const formId = field.Form.items[0].FormID
+      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinToDelete } }})
+      await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})    
+      history.push("/admin/formdetail", { formId: formId })        
+    }        
+  }
 
   function handleChange(e) {
       const {id, value} = e.currentTarget;
@@ -200,7 +227,6 @@ export default function FieldDetail() {
           <Icon>info_outline</Icon>
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {fieldId}</h5>
-        <p className={classes.cardTitle}>Parent ID: {field.formId}</p>
       </CardHeader>
       <CardBody>
       
@@ -252,15 +278,15 @@ export default function FieldDetail() {
             
             <GridItem xs={12} sm={12} md={2}>
             <CustomInput
-              labelText="Field ID"
-              id="field"
-              name="field"
+              labelText="Ref (field id)"
+              id="ref"
+              name="ref"
               formControlProps={{
                 fullWidth: true
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: field.field,                
+                value: field.ref,                
               }}                           
             />
           </GridItem>
@@ -594,7 +620,17 @@ export default function FieldDetail() {
       </CardBody>
       <CardFooter>
         <Button onClick={handleCancel}>Done</Button>        
-        {saveButton}      
+        {saveButton}     
+        {fieldId !== '' && (
+        <Button
+          onClick={() => handleDeleteField()}
+          justIcon
+          color="danger"
+          className={classes.marginRight}
+        >
+          <Cancel className={classes.icons} />
+        </Button>   
+        )}
       </CardFooter>
     </Card>
   )

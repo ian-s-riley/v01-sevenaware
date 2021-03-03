@@ -4,7 +4,7 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { searchFields, getForm, searchForms } from '../../graphql/queries';
+import { listFields, getForm, listForms } from '../../graphql/queries';
 import { updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -35,6 +35,8 @@ import Info from "@material-ui/icons/Info";
 import LocationOn from "@material-ui/icons/LocationOn";
 import Gavel from "@material-ui/icons/Gavel";
 import HelpOutline from "@material-ui/icons/HelpOutline";
+import Dashboard from "@material-ui/icons/Dashboard";
+import Schedule from "@material-ui/icons/Schedule";
 
 import avatar from "assets/img/help/form-help-icon-01.png";
 
@@ -92,19 +94,19 @@ export default function FormTemplate() {
     }
 
     async function fetchFields() {  
-      const apiData = await API.graphql(graphqlOperation(searchFields, {
+      const apiData = await API.graphql(graphqlOperation(listFields, {
         filter: { formId: { match: formId }},
         sort: {
           direction: 'asc',
           field: 'order'
         }
       }));
-      const fieldsFromAPI = apiData.data.searchFields.items 
+      const fieldsFromAPI = apiData.data.listFields.items 
       setFields(fieldsFromAPI);  
     }
 
     async function fetchSubforms() {
-      const apiData = await API.graphql(graphqlOperation(searchForms, {
+      const apiData = await API.graphql(graphqlOperation(listForms, {
         filter: { parentFormId: { match: formId }},
         sort: {
           direction: 'asc',
@@ -112,7 +114,7 @@ export default function FormTemplate() {
         }
       }));
       //show all subforms
-      const formsFromAPI = apiData.data.searchForms.items 
+      const formsFromAPI = apiData.data.listForms.items 
       setSubforms(formsFromAPI)
 
       //get the incomplete subforms for navigation
@@ -123,7 +125,7 @@ export default function FormTemplate() {
 
     async function fetchSiblingForms() {
       const apiData = await API.graphql(graphqlOperation(
-        searchForms, {
+        listForms, {
           filter: {             
             and: [
               { id: { ne: formId } },
@@ -137,7 +139,7 @@ export default function FormTemplate() {
           }
         }
         ))
-      const formsFromAPI = apiData.data.searchForms.items 
+      const formsFromAPI = apiData.data.listForms.items 
       setSiblingForms(formsFromAPI)
       //console.log('siblingFormsFromAPI', formsFromAPI)
     }
@@ -201,6 +203,79 @@ export default function FormTemplate() {
 
   return (
     <div>
+      <GridContainer>
+        <GridItem xs={12} sm={12} md={6}>
+          <Card>
+            <CardHeader>
+              <h4 className={classes.cardTitle}>
+                Navigation Pills Icons <small> - Vertical Tabs</small>
+              </h4>
+            </CardHeader>
+            <CardBody>
+              <NavPills
+                color="rose"
+                horizontal={{
+                  tabsGrid: { xs: 12, sm: 12, md: 4 },
+                  contentGrid: { xs: 12, sm: 12, md: 8 }
+                }}
+                tabs={[
+                  {
+                    tabButton: "Dashboard",
+                    tabIcon: Dashboard,
+                    tabContent: (
+                      <span>
+                        <p>
+                          Collaboratively administrate empowered markets via
+                          plug-and-play networks. Dynamically procrastinate B2C
+                          users after installed base benefits.
+                        </p>
+                        <br />
+                        <p>
+                          Dramatically visualize customer directed convergence
+                          without revolutionary ROI. Collaboratively
+                          administrate empowered markets via plug-and-play
+                          networks. Dynamically procrastinate B2C users after
+                          installed base benefits.
+                        </p>
+                        <br />
+                        <p>
+                          Dramatically visualize customer directed convergence
+                          without revolutionary ROI. Collaboratively
+                          administrate empowered markets via plug-and-play
+                          networks. Dynamically procrastinate B2C users after
+                          installed base benefits.
+                        </p>
+                      </span>
+                    )
+                  },
+                  {
+                    tabButton: "Schedule",
+                    tabIcon: Schedule,
+                    tabContent: (
+                      <span>
+                        <p>
+                          Efficiently unleash cross-media information without
+                          cross-media value. Quickly maximize timely
+                          deliverables for real-time schemas.
+                        </p>
+                        <br />
+                        <p>
+                          Dramatically maintain clicks-and-mortar solutions
+                          without functional solutions. Dramatically visualize
+                          customer directed convergence without revolutionary
+                          ROI. Collaboratively administrate empowered markets
+                          via plug-and-play networks. Dynamically procrastinate
+                          B2C users after installed base benefits.
+                        </p>
+                      </span>
+                    )
+                  }
+                ]}
+              />
+            </CardBody>
+          </Card>
+        </GridItem>
+      </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <Card>

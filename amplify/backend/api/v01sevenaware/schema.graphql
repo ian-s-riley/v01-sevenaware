@@ -1,47 +1,68 @@
-type Form @model 
-  @searchable
-  @auth(rules: [
-    {allow: public}
-  ])   
-  {
-    id: ID!
-    form: String
-    name: String!
-    code: String
-    order: Int!
-    description: String
-    helpCategory: String
-    helpTitle: String
-    helpDescription: String
-    legal: String
-    parentFormId: String!
-    parentForm: String
-    isArray: String
-    isComplete: String
-  }
+type Form @model
+          @key (name:"SortFormsByName", fields:["name"], queryField: "SortFormsByName")
+          @key (name:"SortFormsByOrder", fields:["order"], queryField: "SortFormsByOrder")
+{
+  id: ID!
+  name: String!  
+  order: Int!
+	code: String
+  ref: String	
+  image: String
+	description: String
+  helpImage: String
+	helpCategory: String
+	helpTitle: String
+	helpDescription: String
+  legalImage: String
+	legalCategory: String
+  legalTitle: String
+  legalDescription: String
+  dox: String
+	isComplete: Boolean
+  isTopLevel: Boolean
+  Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
+  Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
+ }
 
-type Field 	@model 
-  @searchable
-  @auth(rules: [
-    {allow: public}
-  ]) 
-  {
-    id: ID!
-    field: String    
-    name: String!
-    code: String
-    description: String
-    fieldType: String
-    order: Int
-    value: String
-    defaultValue: String
-    options: String
-    userId: String
-    lenderId: String
-    label: String
-    helpText: String
-    image: String
-    formId: String! 
-    form: String
-    size: Int
-  }
+type Field  @model
+            @key (name:"SortFieldsByOrder", fields:["order"], queryField: "SortFielsByOrder")
+{
+  id: ID!
+	name: String!
+  order: Int!
+	code: String
+  ref: String
+	description: String
+	fieldType: String	
+	value: String
+	defaultValue: String
+	options: String
+	userId: String
+	lenderId: String
+	label: String
+	helpText: String
+  image: String
+	dox: String
+  size: Int
+  Form: [FieldFormJoin]!@connection(keyName: "byField", fields: ["id"])
+}
+
+type FieldFormJoin @model
+@key(name: "byForm", fields: ["FormID", "FieldID"])
+@key(name: "byField", fields: ["FieldID", "FormID"]){
+  id: ID!
+  FormID: ID!
+  FieldID: ID!
+  Form: Form!   @connection(fields: ["FormID"])      
+  Field: Field!  @connection(fields: ["FieldID"])
+}
+
+type SubformFormJoin @model
+@key(name: "byForm", fields: ["FormID", "SubformID"])
+@key(name: "bySubform", fields: ["SubformID", "FormID"]){
+  id: ID!
+  FormID: ID!
+  SubformID: ID!
+  Form: Form!   @connection(fields: ["FormID"])      
+  Subform: Form!  @connection(fields: ["SubformID"])
+}

@@ -5,19 +5,43 @@ export const getForm = /* GraphQL */ `
   query GetForm($id: ID!) {
     getForm(id: $id) {
       id
-      form
       name
-      code
       order
+      code
+      ref
+      image
       description
+      helpImage
       helpCategory
       helpTitle
       helpDescription
-      legal
-      parentFormId
-      parentForm
-      isArray
+      legalImage
+      legalCategory
+      legalTitle
+      legalDescription
+      dox
       isComplete
+      isTopLevel
+      Field {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      Subform {
+        items {
+          id
+          FormID
+          SubformID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -32,19 +56,29 @@ export const listForms = /* GraphQL */ `
     listForms(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        form
         name
-        code
         order
+        code
+        ref
+        image
         description
+        helpImage
         helpCategory
         helpTitle
         helpDescription
-        legal
-        parentFormId
-        parentForm
-        isArray
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
         isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -56,12 +90,12 @@ export const getField = /* GraphQL */ `
   query GetField($id: ID!) {
     getField(id: $id) {
       id
-      field
       name
+      order
       code
+      ref
       description
       fieldType
-      order
       value
       defaultValue
       options
@@ -70,9 +104,18 @@ export const getField = /* GraphQL */ `
       label
       helpText
       image
-      formId
-      form
+      dox
       size
+      Form {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -87,12 +130,12 @@ export const listFields = /* GraphQL */ `
     listFields(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        field
         name
+        order
         code
+        ref
         description
         fieldType
-        order
         value
         defaultValue
         options
@@ -101,9 +144,11 @@ export const listFields = /* GraphQL */ `
         label
         helpText
         image
-        formId
-        form
+        dox
         size
+        Form {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -111,67 +156,48 @@ export const listFields = /* GraphQL */ `
     }
   }
 `;
-export const searchForms = /* GraphQL */ `
-  query SearchForms(
-    $filter: SearchableFormFilterInput
-    $sort: SearchableFormSortInput
-    $limit: Int
-    $nextToken: String
-    $from: Int
-  ) {
-    searchForms(
-      filter: $filter
-      sort: $sort
-      limit: $limit
-      nextToken: $nextToken
-      from: $from
-    ) {
-      items {
+export const getFieldFormJoin = /* GraphQL */ `
+  query GetFieldFormJoin($id: ID!) {
+    getFieldFormJoin(id: $id) {
+      id
+      FormID
+      FieldID
+      Form {
         id
-        form
         name
-        code
         order
+        code
+        ref
+        image
         description
+        helpImage
         helpCategory
         helpTitle
         helpDescription
-        legal
-        parentFormId
-        parentForm
-        isArray
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
         isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
         createdAt
         updatedAt
       }
-      nextToken
-      total
-    }
-  }
-`;
-export const searchFields = /* GraphQL */ `
-  query SearchFields(
-    $filter: SearchableFieldFilterInput
-    $sort: SearchableFieldSortInput
-    $limit: Int
-    $nextToken: String
-    $from: Int
-  ) {
-    searchFields(
-      filter: $filter
-      sort: $sort
-      limit: $limit
-      nextToken: $nextToken
-      from: $from
-    ) {
-      items {
+      Field {
         id
-        field
         name
+        order
         code
+        ref
         description
         fieldType
-        order
         value
         defaultValue
         options
@@ -180,14 +206,347 @@ export const searchFields = /* GraphQL */ `
         label
         helpText
         image
-        formId
-        form
+        dox
         size
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listFieldFormJoins = /* GraphQL */ `
+  query ListFieldFormJoins(
+    $filter: ModelFieldFormJoinFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listFieldFormJoins(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        FormID
+        FieldID
+        Form {
+          id
+          name
+          order
+          code
+          ref
+          image
+          description
+          helpImage
+          helpCategory
+          helpTitle
+          helpDescription
+          legalImage
+          legalCategory
+          legalTitle
+          legalDescription
+          dox
+          isComplete
+          isTopLevel
+          createdAt
+          updatedAt
+        }
+        Field {
+          id
+          name
+          order
+          code
+          ref
+          description
+          fieldType
+          value
+          defaultValue
+          options
+          userId
+          lenderId
+          label
+          helpText
+          image
+          dox
+          size
+          createdAt
+          updatedAt
+        }
         createdAt
         updatedAt
       }
       nextToken
-      total
+    }
+  }
+`;
+export const getSubformFormJoin = /* GraphQL */ `
+  query GetSubformFormJoin($id: ID!) {
+    getSubformFormJoin(id: $id) {
+      id
+      FormID
+      SubformID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Subform {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listSubformFormJoins = /* GraphQL */ `
+  query ListSubformFormJoins(
+    $filter: ModelSubformFormJoinFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listSubformFormJoins(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        FormID
+        SubformID
+        Form {
+          id
+          name
+          order
+          code
+          ref
+          image
+          description
+          helpImage
+          helpCategory
+          helpTitle
+          helpDescription
+          legalImage
+          legalCategory
+          legalTitle
+          legalDescription
+          dox
+          isComplete
+          isTopLevel
+          createdAt
+          updatedAt
+        }
+        Subform {
+          id
+          name
+          order
+          code
+          ref
+          image
+          description
+          helpImage
+          helpCategory
+          helpTitle
+          helpDescription
+          legalImage
+          legalCategory
+          legalTitle
+          legalDescription
+          dox
+          isComplete
+          isTopLevel
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const sortFormsByName = /* GraphQL */ `
+  query SortFormsByName(
+    $name: String
+    $sortDirection: ModelSortDirection
+    $filter: ModelFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    SortFormsByName(
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const sortFormsByOrder = /* GraphQL */ `
+  query SortFormsByOrder(
+    $order: Int
+    $sortDirection: ModelSortDirection
+    $filter: ModelFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    SortFormsByOrder(
+      order: $order
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const sortFielsByOrder = /* GraphQL */ `
+  query SortFielsByOrder(
+    $order: Int
+    $sortDirection: ModelSortDirection
+    $filter: ModelFieldFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    SortFielsByOrder(
+      order: $order
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        order
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
     }
   }
 `;

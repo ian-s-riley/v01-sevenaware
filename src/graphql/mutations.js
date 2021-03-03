@@ -8,19 +8,43 @@ export const createForm = /* GraphQL */ `
   ) {
     createForm(input: $input, condition: $condition) {
       id
-      form
       name
-      code
       order
+      code
+      ref
+      image
       description
+      helpImage
       helpCategory
       helpTitle
       helpDescription
-      legal
-      parentFormId
-      parentForm
-      isArray
+      legalImage
+      legalCategory
+      legalTitle
+      legalDescription
+      dox
       isComplete
+      isTopLevel
+      Field {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      Subform {
+        items {
+          id
+          FormID
+          SubformID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -33,19 +57,43 @@ export const updateForm = /* GraphQL */ `
   ) {
     updateForm(input: $input, condition: $condition) {
       id
-      form
       name
-      code
       order
+      code
+      ref
+      image
       description
+      helpImage
       helpCategory
       helpTitle
       helpDescription
-      legal
-      parentFormId
-      parentForm
-      isArray
+      legalImage
+      legalCategory
+      legalTitle
+      legalDescription
+      dox
       isComplete
+      isTopLevel
+      Field {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      Subform {
+        items {
+          id
+          FormID
+          SubformID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -58,19 +106,43 @@ export const deleteForm = /* GraphQL */ `
   ) {
     deleteForm(input: $input, condition: $condition) {
       id
-      form
       name
-      code
       order
+      code
+      ref
+      image
       description
+      helpImage
       helpCategory
       helpTitle
       helpDescription
-      legal
-      parentFormId
-      parentForm
-      isArray
+      legalImage
+      legalCategory
+      legalTitle
+      legalDescription
+      dox
       isComplete
+      isTopLevel
+      Field {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      Subform {
+        items {
+          id
+          FormID
+          SubformID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -83,12 +155,12 @@ export const createField = /* GraphQL */ `
   ) {
     createField(input: $input, condition: $condition) {
       id
-      field
       name
+      order
       code
+      ref
       description
       fieldType
-      order
       value
       defaultValue
       options
@@ -97,9 +169,18 @@ export const createField = /* GraphQL */ `
       label
       helpText
       image
-      formId
-      form
+      dox
       size
+      Form {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -112,12 +193,12 @@ export const updateField = /* GraphQL */ `
   ) {
     updateField(input: $input, condition: $condition) {
       id
-      field
       name
+      order
       code
+      ref
       description
       fieldType
-      order
       value
       defaultValue
       options
@@ -126,9 +207,18 @@ export const updateField = /* GraphQL */ `
       label
       helpText
       image
-      formId
-      form
+      dox
       size
+      Form {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -141,12 +231,12 @@ export const deleteField = /* GraphQL */ `
   ) {
     deleteField(input: $input, condition: $condition) {
       id
-      field
       name
+      order
       code
+      ref
       description
       fieldType
-      order
       value
       defaultValue
       options
@@ -155,9 +245,426 @@ export const deleteField = /* GraphQL */ `
       label
       helpText
       image
-      formId
-      form
+      dox
       size
+      Form {
+        items {
+          id
+          FormID
+          FieldID
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createFieldFormJoin = /* GraphQL */ `
+  mutation CreateFieldFormJoin(
+    $input: CreateFieldFormJoinInput!
+    $condition: ModelFieldFormJoinConditionInput
+  ) {
+    createFieldFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      FieldID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Field {
+        id
+        name
+        order
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateFieldFormJoin = /* GraphQL */ `
+  mutation UpdateFieldFormJoin(
+    $input: UpdateFieldFormJoinInput!
+    $condition: ModelFieldFormJoinConditionInput
+  ) {
+    updateFieldFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      FieldID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Field {
+        id
+        name
+        order
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteFieldFormJoin = /* GraphQL */ `
+  mutation DeleteFieldFormJoin(
+    $input: DeleteFieldFormJoinInput!
+    $condition: ModelFieldFormJoinConditionInput
+  ) {
+    deleteFieldFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      FieldID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Field {
+        id
+        name
+        order
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createSubformFormJoin = /* GraphQL */ `
+  mutation CreateSubformFormJoin(
+    $input: CreateSubformFormJoinInput!
+    $condition: ModelSubformFormJoinConditionInput
+  ) {
+    createSubformFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      SubformID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Subform {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateSubformFormJoin = /* GraphQL */ `
+  mutation UpdateSubformFormJoin(
+    $input: UpdateSubformFormJoinInput!
+    $condition: ModelSubformFormJoinConditionInput
+  ) {
+    updateSubformFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      SubformID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Subform {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteSubformFormJoin = /* GraphQL */ `
+  mutation DeleteSubformFormJoin(
+    $input: DeleteSubformFormJoinInput!
+    $condition: ModelSubformFormJoinConditionInput
+  ) {
+    deleteSubformFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      SubformID
+      Form {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      Subform {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
       createdAt
       updatedAt
     }

@@ -5,8 +5,15 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { searchForms, getForm, searchFields } from '../../graphql/queries';
-import { createForm as createFormMutation, deleteForm as deleteFormMutation, updateForm as updateFormMutation, deleteField as deleteFieldMutation } from '../../graphql/mutations';
+import { getForm } from '../../graphql/customQueries';
+import { 
+  createForm as createFormMutation, 
+  createSubformFormJoin as createSubformFormJoinMutation,
+  deleteForm as deleteFormMutation, 
+  deleteSubformFormJoin as deleteSubformFormJoinMutation,
+  updateForm as updateFormMutation 
+} from '../../graphql/mutations';
+
 //import { onCreateField, onUpdateField } from "../../graphql/subscriptions";
 
 // @material-ui/core components
@@ -34,23 +41,27 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
-import { createHashHistory } from 'history';
 const useStyles = makeStyles(styles);
 
 const initialFormState = { 
-                          form: '',
-                          name: '', 
-                          code: '', 
-                          order: 0, 
-                          description: '', 
-                          helpCategory: '',
-                          helpTitle: '',
-                          helpDescription: '',
-                          legal: '',
-                          parentFormId:  '-1', 
-                          parentForm: '',
-                          isArray: '',
-                          isComplete: '' }
+  name: '',  
+  order: 10,
+	code: '',
+  ref: '',	
+  image: '',
+	description: '',
+  helpImage: '',
+	helpCategory: '',
+	helpTitle: '',
+	helpDescription: '',
+  legalImage: '',
+	legalCategory: '',
+  legalTitle: '',
+  legalDescription: '',
+  dox: '',
+	isComplete: false,
+  isTopLevel: true,
+}
 
 export default function FormDetail() {
   const history = useHistory();
@@ -58,7 +69,7 @@ export default function FormDetail() {
   const tableCellClasses = classnames(classes.tableCell);
 
   const [formId, setFormId] = useState(history.location.state.formId)
-  const [newFormParentId, setNewFormParentId] = useState(history.location.state.newFormParentId)
+  const [newFormParentId, setNewFormParentId] = useState(history.location.state.newFormParentId)  
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
   const [fields, setFields] = useState([])  
@@ -76,8 +87,6 @@ export default function FormDetail() {
 
   useEffect(() => {
     fetchForm()    
-    fetchSubforms()
-    fetchFields()
   }, [formId])
 
   // useEffect(() => {
@@ -93,39 +102,14 @@ export default function FormDetail() {
   async function fetchForm() {
       if (formId === '') {
           //new form, get the parent form we will use
-          setForm({ ...initialFormState, parentFormId: newFormParentId })
+          setForm({ ...initialFormState, isTopLevel: newFormParentId === '-1' })
       } else {
-        console.log('fetchForm: formId', formId)
-        const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});       
-        setForm(formFromAPI.data.getForm)      
+        const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});              
+        setForm(formFromAPI.data.getForm)            
+        setSubforms(formFromAPI.data.getForm.Subform.items)  
+        setFields(formFromAPI.data.getForm.Field.items)         
       }
   }  
-
-  async function fetchSubforms() {
-    const apiData = await API.graphql(graphqlOperation(searchForms, {
-      filter: { parentFormId: { match: formId }},
-      sort: {
-        direction: 'asc',
-        field: 'order'
-      }
-    }));
-    const formsFromAPI = apiData.data.searchForms.items 
-    setSubforms(formsFromAPI);  
-  }
-
-  async function fetchFields() {
-    //const fieldsFromAPI = await API.graphql({ query: listFields, variables: { filter: {formId: {eq: formId}} } });
-    //setFields(fieldsFromAPI.data.listFields.items);    
-    const apiData = await API.graphql(graphqlOperation(searchFields, {
-      filter: { formId: { match: formId }},
-      sort: {
-        direction: 'asc',
-        field: 'order'
-      }
-    }));
-    const fieldsFromAPI = apiData.data.searchFields.items 
-    setFields(fieldsFromAPI);  
-  }
 
   // function subscribeCreateField() {
   //   const subscription = API.graphql(graphqlOperation(onCreateField))
@@ -160,40 +144,66 @@ export default function FormDetail() {
   //     return () => subscription.unsubscribe();
   // }
 
-  async function createForm() {
+  async function createForm() {    
     if (!form.name || !form.code) return    
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const formFromAPI = apiData.data.createForm
+
+    //if not a top level form, add the subform to form join
+    if (newFormParentId !== '-1') {
+      console.log('create Subform', formFromAPI.id)
+      console.log('create for parent form', newFormParentId)
+      await API.graphql(graphqlOperation(createSubformFormJoinMutation,{
+        input:{
+          FormID: newFormParentId, 
+          SubformID: apiData.data.createForm.id
+        }
+      })) 
+    }    
+
     setNewFormParentId('')
     setFormId(formFromAPI.id)
   }
 
   async function updateForm() {
+    console.log('updateForm', form)
     if (!form.name || !form.code) return     
     await API.graphql({ 
                         query: updateFormMutation, 
                         variables: { input: {
-                          id: form.id, 
-                          form: form.form, 
-                          code: form.code,
-                          name: form.name, 
-                          order: form.order, 
-                          description: form.description,
-                          helpCategory: form.helpCategory,
-                          helpTitle: form.helpTitle,
-                          helpDescription: form.helpDescription,
-                          legal: form.legal,
-                        }} 
-                      });  
+                        id: form.id, 
+                        name: form.name,  
+                        order: form.order,
+                        code: form.code,
+                        ref: form.ref,	
+                        image: form.image,
+                        description: form.description,
+                        helpImage: form.helpImage,
+                        helpCategory: form.helpCategory,
+                        helpTitle: form.helpTitle,
+                        helpDescription: form.helpDescription,
+                        legalImage: form.legalImage,
+                        legalCategory: form.legalCategory,
+                        legalTitle: form.legalTitle,
+                        legalDescription: form.legalDescription,
+                        dox: form.dox,
+                      }} 
+                    });  
   }  
 
-  async function handleDeleteSubform({ id }) {
-    var result = confirm("Are you sure you want to delete this subform?");
-    if (result) {      
-      await API.graphql({ query: deleteFormMutation, variables: { input: { id } }});
-      const newSubformsArray = subforms.filter(subform => subform.id !== id)
-      setSubforms(newSubformsArray)
-    }        
+  async function handleDeleteForm() {
+     console.log('delete - form', form)
+    // console.log('delete - form join id', field.Form.items[0].id)    
+    // console.log('delete - parent form id', field.Form.items[0].FormID)   
+    // var result = confirm("Are you sure you want to delete this form?");
+    // if (result) {      
+    //   const formToDelete = formId
+    //   const formJoinToDelete = field.Form.items[0].id
+    //   const formId = field.Form.items[0].FormID
+    //   await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinToDelete } }})
+    //   await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldToDelete } }})    
+    //   history.push("/admin/formdetail", { formId: formId })        
+    // }        
   }
 
   function handleChange(e) {
@@ -202,11 +212,11 @@ export default function FormDetail() {
   }
 
   function handleCancel() {
-    form.parentFormId === '-1' ? history.push("/admin/sevenaforms") : setFormId(form.parentFormId)
+    history.push("/admin/sevenaforms")
+    //form.isTopLevel ? history.push("/admin/sevenaforms") : setFormId(form.parentFormId)
   }  
 
   async function handleSelectSubform({ id }) { 
-    //history.push("/admin/formdetail", { formId: id }) 
     setFormId(id)
   }  
 
@@ -221,16 +231,7 @@ export default function FormDetail() {
 
   function handleCreateField() {
     history.push("/admin/fielddetail", { fieldId: '', newFieldFormId: formId }) 
-  }  
-
-  async function handleDeleteField({ id }) {
-    var result = confirm("Are you sure you want to delete this field?");
-    if (result) {      
-      await API.graphql({ query: deleteFieldMutation, variables: { input: { id } }})
-      const newFieldsArray = fields.filter(field => field.id !== id)
-      setFields(newFieldsArray)      
-    }        
-  }
+  }    
 
   return (
     <>
@@ -240,7 +241,7 @@ export default function FormDetail() {
           <Icon>info_outline</Icon>
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {formId}</h5>
-        <p className={classes.cardTitle}>Parent ID: {form.parentFormId}</p>
+        <p className={classes.cardTitle}>Parent ID: {newFormParentId}</p>
       </CardHeader>
       <CardBody>
       <GridContainer>                    
@@ -288,15 +289,15 @@ export default function FormDetail() {
 
           <GridItem xs={12} sm={12} md={2}>
             <CustomInput
-              labelText="Form ID"
-              id="form"
-              name="form"
+              labelText="Ref (form id)"
+              id="ref"
+              name="ref"
               formControlProps={{
                 fullWidth: true
               }}
               inputProps={{
                 onChange: (event) => handleChange(event),
-                value: form.form,                
+                value: form.ref,                
               }}                           
             />
           </GridItem>
@@ -353,26 +354,65 @@ export default function FormDetail() {
                   rows: 4
                 }}
               />
+          </GridItem>                           
+        </GridContainer>            
+      </CardBody>
+      </Card>
+
+    <Card>
+      <CardBody>
+
+      <GridContainer>          
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Legal Category"
+              id="legalCategory"
+              name="legalCategory"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: form.legalCategory,                
+              }}                           
+            />
+          </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInput
+              labelText="Legal Title"
+              id="legalTitle"
+              name="legalTitle"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: form.legalTitle,                
+              }}                           
+            />
           </GridItem>
 
           <GridItem xs={12} sm={12} md={12}>
             <CustomInput
-                labelText="Legal"
-                id="legal"
-                name="legal"
+                labelText="Legal Description"
+                id="legalDescription"
+                name="legalDescription"
                 formControlProps={{
                   fullWidth: true
                 }}
                 inputProps={{
                   onChange: (event) => handleChange(event),
-                  value: form.legal,
+                  value: form.legalDescription,
                   multiline: true,
                   rows: 4
                 }}
               />
-          </GridItem>                             
-        </GridContainer>         
-      </CardBody>
+          </GridItem>                           
+        </GridContainer>            
+      </CardBody>      
+      </Card>
+      <Card>
       <CardFooter>
         <Button onClick={handleCancel}>Done</Button>        
         {
@@ -387,7 +427,17 @@ export default function FormDetail() {
             color="success"
           >Save</Button>
         )
-        }                
+        }     
+        {formId !== '' && (
+        <Button
+          onClick={() => handleDeleteForm()}
+          justIcon
+          color="danger"
+          className={classes.marginRight}
+        >
+          <Cancel className={classes.icons} />
+        </Button>   
+        )}           
       </CardFooter>
       </Card>
       {(formId !== '') && (
@@ -405,47 +455,37 @@ export default function FormDetail() {
                     <CardBody>
                     <Table className={classes.table}>                    
                       <TableBody>
-                        <TableRow>
-                          <TableCell className={tableCellClasses}>
-                          <Button
-                            onClick={handleCreateSubform}
-                            justIcon
-                            color="success"
-                            className={classes.marginRight}
-                          >
-                            <Add className={classes.icons} />
-                          </Button>
-                          </TableCell>                        
+                        <TableRow>                          
+                          <TableCell className={tableCellClasses}>Order</TableCell>
                           <TableCell className={tableCellClasses}>Subform</TableCell>
                           <TableCell className={tableCellClasses}>Description</TableCell>
-                          <TableCell className={tableCellClasses}>Order</TableCell>
+                          <TableCell className={tableCellClasses}>
+                            <Button
+                              onClick={handleCreateSubform}
+                              justIcon
+                              color="success"
+                              className={classes.marginRight}
+                            >
+                              <Add className={classes.icons} />
+                            </Button>
+                            </TableCell>                        
                         </TableRow>
                       {
                         subforms.map(subform => (
-                          <TableRow className={classes.tableRow} key={subform.id}>
+                          <TableRow className={classes.tableRow} key={subform.Subform.id}>
+                            <TableCell className={tableCellClasses}>{subform.Subform.order}</TableCell>                                                       
+                            <TableCell className={tableCellClasses}>{subform.Subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.Subform.description}</TableCell>                                                                                       
                             <TableCell className={tableCellClasses}>
-                                <>
                                 <Button
-                                  onClick={() => handleSelectSubform(subform)}
+                                  onClick={() => handleSelectSubform(subform.Subform)}
                                   justIcon
                                   color="success"
                                   className={classes.marginRight}
                                 >
                                   <Check className={classes.icons} />
-                                </Button>                                
-                                <Button
-                                  onClick={() => handleDeleteSubform(subform)}
-                                  justIcon
-                                  color="danger"
-                                  className={classes.marginRight}
-                                >
-                                  <Cancel className={classes.icons} />
-                                </Button>
-                                </>
-                            </TableCell>                            
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>                                                           
-                            <TableCell className={tableCellClasses}>{subform.order}</TableCell>
+                                </Button>  
+                            </TableCell> 
                         </TableRow>
                         ))
                       }
@@ -477,7 +517,11 @@ export default function FormDetail() {
                     <CardBody>
                     <Table className={classes.table}>                      
                       <TableBody>
-                        <TableRow>
+                        <TableRow>                          
+                          <TableCell className={tableCellClasses}>Order</TableCell>
+                          <TableCell className={tableCellClasses}>Field Name</TableCell>
+                          <TableCell className={tableCellClasses}>Field Type</TableCell>
+                          <TableCell className={tableCellClasses}>Join ID</TableCell>
                           <TableCell className={tableCellClasses}>
                           <Button
                               onClick={handleCreateField}
@@ -487,34 +531,24 @@ export default function FormDetail() {
                               <Add className={classes.icons} />
                           </Button>
                           </TableCell>
-                          <TableCell className={tableCellClasses}>Field Name</TableCell>
-                          <TableCell className={tableCellClasses}>Field Type</TableCell>
-                          <TableCell className={tableCellClasses}>Order</TableCell>
                         </TableRow>
                       {
                         fields.map(field => (
-                          <TableRow className={classes.tableRow} key={field.id}>                            
+                          <TableRow className={classes.tableRow} key={field.Field.id}>                            
+                          <TableCell className={tableCellClasses}>{field.Field.order}</TableCell>                                                      
+                            <TableCell className={tableCellClasses}>{field.Field.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{field.Field.fieldType}</TableCell>    
+                            <TableCell className={tableCellClasses}>{field.id}</TableCell> 
                             <TableCell className={tableCellClasses}>
                               <Button
-                                onClick={() => handleSelectField(field)}
+                                onClick={() => handleSelectField(field.Field)}
                                 justIcon
                                 color="success"
                                 className={classes.marginRight}
                               >
                                 <Check className={classes.icons} />
-                              </Button>          
-                              <Button
-                                  onClick={() => handleDeleteField(field)}
-                                  justIcon
-                                  color="danger"
-                                  className={classes.marginRight}
-                                >
-                                  <Cancel className={classes.icons} />
-                                </Button>                                                                                      
-                            </TableCell>
-                            <TableCell className={tableCellClasses}>{field.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{field.fieldType}</TableCell>                            
-                            <TableCell className={tableCellClasses}>{field.order}</TableCell>                          
+                              </Button>                                                                                              
+                            </TableCell>                                                    
                         </TableRow>
                         ))
                       }

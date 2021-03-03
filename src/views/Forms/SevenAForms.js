@@ -4,8 +4,7 @@ import { useHistory } from "react-router-dom";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { searchForms } from '../../graphql/queries';
-import { deleteForm as deleteFormMutation } from '../../graphql/mutations';
+import { listForms } from '../../graphql/queries';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -47,16 +46,21 @@ export default function SevenAForms() {
     }, []);
   
     async function fetchForms() {
-      //const apiData = await API.graphql({ query: searchForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
+      //const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
       //const formsFromAPI = apiData.data.listForms.items;
-      const apiData = await API.graphql(graphqlOperation(searchForms, {
-        filter: { parentFormId: { match: "-1" }},
+      
+        //        
+        //filter: {isTopLevel: {eq: true}}
+      
+      const apiData = await API.graphql(graphqlOperation(listForms, {
+        filter: { isTopLevel: { eq: true }},
         sort: {
           direction: 'asc',
           field: 'name'
         }
       }));
-      const formsFromAPI = apiData.data.searchForms.items 
+      const formsFromAPI = apiData.data.listForms.items 
+      console.log(formsFromAPI)
       setForms(formsFromAPI);    
     }
     
@@ -70,15 +74,6 @@ export default function SevenAForms() {
   
     function handlePreviewForm({ id }) {    
       history.push("/admin/formtemplate", { formId: id })
-    }
-
-    async function handleDeleteForm({ id }) {
-      var result = confirm("Are you sure you want to delete this form?");
-      if (result) {      
-        await API.graphql({ query: deleteFormMutation, variables: { input: { id } }})
-        const newFormsArray = forms.filter(form => form.id !== id)
-        setForms(newFormsArray)  
-      }        
     }
     
     return (
@@ -106,8 +101,7 @@ export default function SevenAForms() {
                       </CardHeader>
                       <CardBody>
                           <Button color="success" onClick={() => handleSelectForm(form.id)}>Edit Form</Button>
-                          <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
-                          <Button color="danger" onClick={() => handleDeleteForm(form)}>Delete</Button>
+                          <Button color="info" disabled onClick={() => handlePreviewForm(form)}>Preview</Button>
                       </CardBody>
                       <CardFooter stats>
                         <div className={classes.stats}>

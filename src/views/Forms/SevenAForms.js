@@ -47,7 +47,7 @@ export default function SevenAForms() {
   
     async function fetchForms() {
       const apiData = await API.graphql(graphqlOperation(listForms, {
-        filter: { isTopLevel: { eq: true }},
+        filter: { parentFormId: { eq: '-1' }},
         sort: {
           direction: 'asc',
           field: 'name'
@@ -59,10 +59,11 @@ export default function SevenAForms() {
     }
     
     function handleSelectForm(id) { 
-      history.replace("/admin/formdetail", { formId: id, parentFormId: '-1' }) 
+      history.replace("/admin/formdetail", { formId: id }) 
     }    
   
     function handleCreateForm() {    
+      //create a new top level form
       history.replace("/admin/formDetail", { formId: '', parentFormId: '-1' })
     }
   

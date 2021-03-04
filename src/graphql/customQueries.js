@@ -18,7 +18,6 @@ export const getForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
-      isTopLevel
       Field {
         items {
             Field {

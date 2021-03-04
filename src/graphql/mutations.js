@@ -24,7 +24,7 @@ export const createForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
-      isTopLevel
+      parentFormId
       Field {
         items {
           id
@@ -73,7 +73,7 @@ export const updateForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
-      isTopLevel
+      parentFormId
       Field {
         items {
           id
@@ -122,7 +122,7 @@ export const deleteForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
-      isTopLevel
+      parentFormId
       Field {
         items {
           id
@@ -171,6 +171,7 @@ export const createField = /* GraphQL */ `
       image
       dox
       size
+      parentFormId
       Form {
         items {
           id
@@ -209,6 +210,7 @@ export const updateField = /* GraphQL */ `
       image
       dox
       size
+      parentFormId
       Form {
         items {
           id
@@ -247,6 +249,7 @@ export const deleteField = /* GraphQL */ `
       image
       dox
       size
+      parentFormId
       Form {
         items {
           id
@@ -289,7 +292,7 @@ export const createFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -317,6 +320,7 @@ export const createFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
+        parentFormId
         Form {
           nextToken
         }
@@ -355,7 +359,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -383,6 +387,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
+        parentFormId
         Form {
           nextToken
         }
@@ -421,7 +426,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -449,6 +454,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
+        parentFormId
         Form {
           nextToken
         }
@@ -487,7 +493,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -515,7 +521,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -557,7 +563,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -585,7 +591,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -627,7 +633,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -655,7 +661,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }

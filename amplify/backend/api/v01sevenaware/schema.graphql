@@ -1,6 +1,4 @@
 type Form @model
-          @key (name:"SortFormsByName", fields:["name"], queryField: "SortFormsByName")
-          @key (name:"SortFormsByOrder", fields:["order"], queryField: "SortFormsByOrder")
 {
   id: ID!
   name: String!  
@@ -19,13 +17,12 @@ type Form @model
   legalDescription: String
   dox: String
 	isComplete: Boolean
-  isTopLevel: Boolean
+  parentFormId: String!
   Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
   Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
  }
 
 type Field  @model
-            @key (name:"SortFieldsByOrder", fields:["order"], queryField: "SortFielsByOrder")
 {
   id: ID!
 	name: String!
@@ -44,6 +41,7 @@ type Field  @model
   image: String
 	dox: String
   size: Int
+  parentFormId: String!
   Form: [FieldFormJoin]!@connection(keyName: "byField", fields: ["id"])
 }
 
@@ -59,7 +57,8 @@ type FieldFormJoin @model
 
 type SubformFormJoin @model
 @key(name: "byForm", fields: ["FormID", "SubformID"])
-@key(name: "bySubform", fields: ["SubformID", "FormID"]){
+@key(name: "bySubform", fields: ["SubformID", "FormID"])
+{
   id: ID!
   FormID: ID!
   SubformID: ID!

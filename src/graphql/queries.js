@@ -21,7 +21,7 @@ export const getForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
-      isTopLevel
+      parentFormId
       Field {
         items {
           id
@@ -72,7 +72,7 @@ export const listForms = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -106,6 +106,7 @@ export const getField = /* GraphQL */ `
       image
       dox
       size
+      parentFormId
       Form {
         items {
           id
@@ -146,6 +147,7 @@ export const listFields = /* GraphQL */ `
         image
         dox
         size
+        parentFormId
         Form {
           nextToken
         }
@@ -180,7 +182,7 @@ export const getFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -208,6 +210,7 @@ export const getFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
+        parentFormId
         Form {
           nextToken
         }
@@ -248,7 +251,7 @@ export const listFieldFormJoins = /* GraphQL */ `
           legalDescription
           dox
           isComplete
-          isTopLevel
+          parentFormId
           createdAt
           updatedAt
         }
@@ -270,6 +273,7 @@ export const listFieldFormJoins = /* GraphQL */ `
           image
           dox
           size
+          parentFormId
           createdAt
           updatedAt
         }
@@ -304,7 +308,7 @@ export const getSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -332,7 +336,7 @@ export const getSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
-        isTopLevel
+        parentFormId
         Field {
           nextToken
         }
@@ -380,7 +384,7 @@ export const listSubformFormJoins = /* GraphQL */ `
           legalDescription
           dox
           isComplete
-          isTopLevel
+          parentFormId
           createdAt
           updatedAt
         }
@@ -402,146 +406,9 @@ export const listSubformFormJoins = /* GraphQL */ `
           legalDescription
           dox
           isComplete
-          isTopLevel
+          parentFormId
           createdAt
           updatedAt
-        }
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const sortFormsByName = /* GraphQL */ `
-  query SortFormsByName(
-    $name: String
-    $sortDirection: ModelSortDirection
-    $filter: ModelFormFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    SortFormsByName(
-      name: $name
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        order
-        code
-        ref
-        image
-        description
-        helpImage
-        helpCategory
-        helpTitle
-        helpDescription
-        legalImage
-        legalCategory
-        legalTitle
-        legalDescription
-        dox
-        isComplete
-        isTopLevel
-        Field {
-          nextToken
-        }
-        Subform {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const sortFormsByOrder = /* GraphQL */ `
-  query SortFormsByOrder(
-    $order: Int
-    $sortDirection: ModelSortDirection
-    $filter: ModelFormFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    SortFormsByOrder(
-      order: $order
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        order
-        code
-        ref
-        image
-        description
-        helpImage
-        helpCategory
-        helpTitle
-        helpDescription
-        legalImage
-        legalCategory
-        legalTitle
-        legalDescription
-        dox
-        isComplete
-        isTopLevel
-        Field {
-          nextToken
-        }
-        Subform {
-          nextToken
-        }
-        createdAt
-        updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const sortFielsByOrder = /* GraphQL */ `
-  query SortFielsByOrder(
-    $order: Int
-    $sortDirection: ModelSortDirection
-    $filter: ModelFieldFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    SortFielsByOrder(
-      order: $order
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        name
-        order
-        code
-        ref
-        description
-        fieldType
-        value
-        defaultValue
-        options
-        userId
-        lenderId
-        label
-        helpText
-        image
-        dox
-        size
-        Form {
-          nextToken
         }
         createdAt
         updatedAt

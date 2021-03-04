@@ -61,7 +61,7 @@ const initialFormState = {
   legalDescription: '',
   dox: '',
 	isComplete: false,
-  isTopLevel: true,
+  parentFormId: '-1'
 }
 
 export default function FormDetail() {
@@ -89,7 +89,7 @@ export default function FormDetail() {
 
   useEffect(() => {
     fetchForm()    
-    fetchParentForm()   
+    fetchParentFormJoin()   
   }, [formId])
 
   // useEffect(() => {
@@ -103,21 +103,23 @@ export default function FormDetail() {
   // }, [])
 
   async function fetchForm() {
-      //console.log('fetchForm: formId', formId)
+      console.log('fetchForm: formId', formId)
+      console.log('fetchForm: parentFormId', parentFormId)
       if (formId === '') {
           //new form, get the parent form we will use
-          setForm({ ...initialFormState, isTopLevel: parentFormId === '-1' })
+          setForm({ ...initialFormState, parentFormId: parentFormId })
       } else {
-        const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});              
+        const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }}); 
+        console.log('fetchForm: formFromAPI', formFromAPI)             
         setForm(formFromAPI.data.getForm)            
         setSubforms(formFromAPI.data.getForm.Subform.items)  
         setFields(formFromAPI.data.getForm.Field.items)         
       }
   } 
   
-  async function fetchParentForm() {    
+  async function fetchParentFormJoin() {    
     if (parentFormId !== '-1' && formId !== '') {        
-      //get the parent form connection for navigation & delete
+      //get the parent form connection for delete
       const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
         filter: { SubformID: { eq: formId }},
       }));
@@ -127,8 +129,7 @@ export default function FormDetail() {
         setParentFormJoinId('')
         setParentFormId('-1')
       } else {
-        const parentFormJoinId = parentFormsFromAPI[0].id
-        setParentFormJoinId(parentFormJoinId)
+        setParentFormJoinId(parentFormsFromAPI[0].id)
         setParentFormId(parentFormsFromAPI[0].FormID)
       }      
     }
@@ -172,10 +173,11 @@ export default function FormDetail() {
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const newFormId = apiData.data.createForm.id
 
+    console.log('create form', apiData.data.createForm.id)
+    console.log('createForm: parent form', parentFormId)
+
     //if not a top level form, add the subform to form join
-    if (parentFormId !== '-1') {
-      //console.log('create Subform', formFromAPI.id)
-      //console.log('createForm: parent form', parentFormId)
+    if (parentFormId !== '-1') {      
       const newFormJoinFromAPI = await API.graphql(graphqlOperation(createSubformFormJoinMutation,{
         input:{
           FormID: parentFormId, 
@@ -210,6 +212,7 @@ export default function FormDetail() {
                         legalTitle: form.legalTitle,
                         legalDescription: form.legalDescription,
                         dox: form.dox,
+                        parentFormId: form.parentFormId
                       }} 
                     });  
   }  
@@ -217,7 +220,7 @@ export default function FormDetail() {
   async function handleDeleteForm() {    
     var result = confirm("Are you sure you want to delete this form?");
     if (result) {      
-      if (parentFormJoinId !== '') {
+      if (parentFormJoinId !== '' && parentFormId !== '-1') {
         //delete the join to the parent form
         await API.graphql({ query: deleteSubformFormJoinMutation, variables: { input: { id: parentFormJoinId } }})
       }
@@ -253,7 +256,7 @@ export default function FormDetail() {
 
   async function handleSelectSubform({ id }) { 
     setParentFormJoinId('')
-    setParentFormId(formId)
+    setParentFormId('')
     setFormId(id)
   }    
 
@@ -262,7 +265,7 @@ export default function FormDetail() {
   }  
 
   function handleCreateField() {
-    history.push("/admin/fielddetail", { fieldId: '', newFieldFormId: formId }) 
+    history.push("/admin/fielddetail", { fieldId: '', parentFormId: formId }) 
   }    
 
   return (

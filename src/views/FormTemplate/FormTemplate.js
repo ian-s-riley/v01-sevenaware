@@ -176,8 +176,8 @@ export default function FormTemplate() {
               <NavPills
                 color="rose"
                 horizontal={{
-                  tabsGrid: { xs: 12, sm: 12, md: 2 },
-                  contentGrid: { xs: 12, sm: 12, md: 10 }
+                  tabsGrid: { xs: 12, sm: 12, md: 3 },
+                  contentGrid: { xs: 12, sm: 12, md: 9 }
                 }}
                 tabs={[
                   {

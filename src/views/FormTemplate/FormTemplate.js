@@ -4,7 +4,8 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { listFields, getForm, listForms } from '../../graphql/queries';
+import { getForm } from '../../graphql/customQueries';
+import { listFields, listForms } from '../../graphql/queries';
 import { updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -78,49 +79,22 @@ export default function FormTemplate() {
     
 
     useEffect(() => {
-      fetchForm();
-      fetchFields();
-      fetchSubforms()
+      fetchForm()
     }, [formId]);
 
-    useEffect(() => {
-      fetchSiblingForms()
-    }, [form]);
+    // useEffect(() => {
+    //   fetchSiblingForms()
+    // }, [form]);
   
     async function fetchForm() {
-      const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});  
-      //console.log('formFromAPI', formFromAPI)          
-      setForm(formFromAPI.data.getForm )
-    }
-
-    async function fetchFields() {  
-      const apiData = await API.graphql(graphqlOperation(listFields, {
-        filter: { formId: { match: formId }},
-        sort: {
-          direction: 'asc',
-          field: 'order'
-        }
-      }));
-      const fieldsFromAPI = apiData.data.listFields.items 
-      setFields(fieldsFromAPI);  
-    }
-
-    async function fetchSubforms() {
-      const apiData = await API.graphql(graphqlOperation(listForms, {
-        filter: { parentFormId: { match: formId }},
-        sort: {
-          direction: 'asc',
-          field: 'order'
-        }
-      }));
-      //show all subforms
-      const formsFromAPI = apiData.data.listForms.items 
-      setSubforms(formsFromAPI)
-
-      //get the incomplete subforms for navigation
-      const incompleteSubformFromAPI = formsFromAPI.filter(incompleteForm => incompleteForm.isComplete === '');
-      //console.log('incompleteSubformFromAPI', incompleteSubformFromAPI)
-      setIncompleteSubforms(incompleteSubformFromAPI)
+      const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});    
+      console.log('fetchForm : formFromAPI', formFromAPI)          
+      //console.log('fetchForm : formFromAPI.data.getForm', formFromAPI.data.getForm)          
+      //console.log('fetchForm : formFromAPI.data.getForm.Subform.items', formFromAPI.data.getForm.Subform.items)     
+      //console.log('fetchForm : formFromAPI.data.getForm.Field.items', formFromAPI.data.getForm.Field.items)     
+      setForm(formFromAPI.data.getForm)            
+      setSubforms(formFromAPI.data.getForm.Subform.items)  
+      setFields(formFromAPI.data.getForm.Field.items)
     }
 
     async function fetchSiblingForms() {
@@ -192,82 +166,121 @@ export default function FormTemplate() {
       history.push("/admin/formtemplate", { formId: id })
     }  
 
-    const handleFixedClick = () => {
-      if (fixedClasses === "dropdown") {
-          setFixedClasses("dropdown show");
-      } else {
-           setFixedClasses("dropdown");
-      }
-      }; 
-
 
   return (
     <div>
       <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
+        <GridItem xs={12} sm={12} md={12}>
           <Card>
-            <CardHeader>
-              <h4 className={classes.cardTitle}>
-                Navigation Pills Icons <small> - Vertical Tabs</small>
-              </h4>
-            </CardHeader>
             <CardBody>
               <NavPills
                 color="rose"
                 horizontal={{
-                  tabsGrid: { xs: 12, sm: 12, md: 4 },
-                  contentGrid: { xs: 12, sm: 12, md: 8 }
+                  tabsGrid: { xs: 12, sm: 12, md: 2 },
+                  contentGrid: { xs: 12, sm: 12, md: 10 }
                 }}
                 tabs={[
                   {
-                    tabButton: "Dashboard",
+                    tabButton: "Form",
                     tabIcon: Dashboard,
                     tabContent: (
-                      <span>
-                        <p>
-                          Collaboratively administrate empowered markets via
-                          plug-and-play networks. Dynamically procrastinate B2C
-                          users after installed base benefits.
-                        </p>
-                        <br />
-                        <p>
-                          Dramatically visualize customer directed convergence
-                          without revolutionary ROI. Collaboratively
-                          administrate empowered markets via plug-and-play
-                          networks. Dynamically procrastinate B2C users after
-                          installed base benefits.
-                        </p>
-                        <br />
-                        <p>
-                          Dramatically visualize customer directed convergence
-                          without revolutionary ROI. Collaboratively
-                          administrate empowered markets via plug-and-play
-                          networks. Dynamically procrastinate B2C users after
-                          installed base benefits.
-                        </p>
-                      </span>
+                      <Card>
+                        <CardHeader color="primary">
+                          <h4 className={classes.cardTitleWhite}>{form.name}</h4>
+                          <p className={classes.cardCategoryWhite}>{form.description}</p>
+                        </CardHeader>
+                        <CardBody>
+                          <GridContainer>
+                          {
+                              fields.map(field => (
+                                <SevenAField key={field.Field.id} field={field.Field} />
+                              ))
+                            }                   
+                          </GridContainer>        
+                        </CardBody>
+                        <CardFooter>
+                          <Button color="info" onClick={handleBackClick}>Back</Button>
+                          {form.isComplete ? (<Button onClick={() => handlePublishForm('')}>Unpublish</Button>) : (<Button color="success" onClick={() => handlePublishForm('true')}>Publish</Button>)}
+                          <Button color="info" onClick={handleNextClick}>Next</Button>
+                        </CardFooter>
+                      </Card>
                     )
                   },
                   {
-                    tabButton: "Schedule",
-                    tabIcon: Schedule,
+                    tabButton: "Next Steps",
+                    tabIcon: Info,
                     tabContent: (
-                      <span>
-                        <p>
-                          Efficiently unleash cross-media information without
-                          cross-media value. Quickly maximize timely
-                          deliverables for real-time schemas.
+                      <Card>
+                        <CardHeader color="warning">
+                        <h4 className={classes.cardTitleWhite}>Application Process</h4>
+                        <p className={classes.cardCategoryWhite}>
+                            A quick preview of more info we'll need to collect:
                         </p>
-                        <br />
-                        <p>
-                          Dramatically maintain clicks-and-mortar solutions
-                          without functional solutions. Dramatically visualize
-                          customer directed convergence without revolutionary
-                          ROI. Collaboratively administrate empowered markets
-                          via plug-and-play networks. Dynamically procrastinate
-                          B2C users after installed base benefits.
-                        </p>
-                      </span>
+                        </CardHeader>
+                        <CardBody>
+                        <Table className={classes.table}>
+                          <TableBody>
+                          {
+                            subforms.map(subform => (
+                              <TableRow className={classes.tableRow} key={subform.Subform.id}>
+                              <TableCell className={tableCellClasses}>
+                                  <Checkbox
+                                    checked={subform.Subform.isComplete !== ''}
+                                    checkedIcon={<Check className={classes.checkedIcon} />}
+                                    icon={<Check className={classes.uncheckedIcon} />}
+                                    classes={{
+                                      checked: classes.checked,
+                                      root: classes.root
+                                    }}
+                                  />
+                                </TableCell>
+                                <TableCell className={tableCellClasses}>{subform.Subform.name}</TableCell>
+                                <TableCell className={tableCellClasses}>{subform.Subform.description}</TableCell>
+                                <TableCell className={tableCellClasses}>
+                                <Button
+                                    onClick={() => handleSelectForm(subform.Subform)}
+                                    justIcon
+                                    color="success"
+                                    className={classes.marginRight}
+                                  >
+                                    <Edit className={classes.icons} />
+                                  </Button>
+                                </TableCell>
+                            </TableRow>
+                            ))
+                          }
+                          </TableBody>
+                        </Table>                      
+                        </CardBody>
+                    </Card>
+                    )
+                  },
+                  {
+                    tabButton: "Help Center",
+                    tabIcon: HelpOutline,
+                    tabContent: (
+                      <Card>
+                        <CardHeader>
+                          <h4 className={classes.cardTitle}>{form.helpCategory}</h4>
+                          <p className={classes.cardCategory}>
+                            {form.helpTitle}
+                          </p>
+                        </CardHeader>
+                        <CardBody>
+                          {form.helpDescription}
+                        </CardBody>
+                      </Card>
+                    )
+                  },
+                  {
+                    tabButton: "Legal Info",
+                    tabIcon: Gavel,
+                    tabContent: (
+                      <Card>
+                        <CardBody>
+                          {form.legalDescription}
+                        </CardBody>
+                      </Card>
                     )
                   }
                 ]}
@@ -278,116 +291,9 @@ export default function FormTemplate() {
       </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className={classes.cardTitleWhite}>{form.name}</h4>
-              <p className={classes.cardCategoryWhite}>{form.description}</p>
-            </CardHeader>
-            <CardBody>
-              <GridContainer>
-              {
-                  fields.map(field => (
-                    <SevenAField key={field.id} field={field} />
-                  ))
-                }                   
-              </GridContainer>        
-            </CardBody>
-            <CardFooter>
-              <Button color="info" onClick={handleBackClick}>Back</Button>
-              {form.isComplete ? (<Button onClick={() => handlePublishForm('')}>Unpublish</Button>) : (<Button color="success" onClick={() => handlePublishForm('true')}>Publish</Button>)}
-              <Button color="info" onClick={handleNextClick}>Next</Button>
-            </CardFooter>
-          </Card>
+          
         </GridItem>
-      </GridContainer>
-
-        <GridContainer justify="center">
-        <GridItem xs={12} sm={12} md={12}>
-          <NavPills
-            color="warning"
-            alignCenter
-            tabs={[
-              {
-                tabButton: "Help Center",
-                tabIcon: HelpOutline,
-                tabContent: (
-                  <Card>
-                    <CardHeader>
-                      <h4 className={classes.cardTitle}>{form.helpCategory}</h4>
-                      <p className={classes.cardCategory}>
-                        {form.helpTitle}
-                      </p>
-                    </CardHeader>
-                    <CardBody>
-                      {form.helpDescription}
-                    </CardBody>
-                  </Card>
-                )
-              },
-              {
-                tabButton: "More Info",
-                tabIcon: Info,
-                tabContent: (
-                  <Card>
-                    <CardHeader color="warning">
-                    <h4 className={classes.cardTitleWhite}>Application Process</h4>
-                    <p className={classes.cardCategoryWhite}>
-                        A quick preview of more info we'll need to collect:
-                    </p>
-                    </CardHeader>
-                    <CardBody>
-                    <Table className={classes.table}>
-                      <TableBody>
-                      {
-                        subforms.map(subform => (
-                          <TableRow className={classes.tableRow} key={subform.id}>
-                          <TableCell className={tableCellClasses}>
-                              <Checkbox
-                                checked={subform.isComplete !== ''}
-                                checkedIcon={<Check className={classes.checkedIcon} />}
-                                icon={<Check className={classes.uncheckedIcon} />}
-                                classes={{
-                                  checked: classes.checked,
-                                  root: classes.root
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>
-                            <TableCell className={tableCellClasses}>
-                            <Button
-                                onClick={() => handleSelectForm(subform)}
-                                justIcon
-                                color="success"
-                                className={classes.marginRight}
-                              >
-                                <Edit className={classes.icons} />
-                              </Button>
-                            </TableCell>
-                        </TableRow>
-                        ))
-                      }
-                      </TableBody>
-                    </Table>                      
-                    </CardBody>
-                </Card>
-                )
-              },
-              {
-                tabButton: "Legal Info",
-                tabIcon: Gavel,
-                tabContent: (
-                  <Card>
-                    <CardBody>
-                      {form.legal}
-                    </CardBody>
-                  </Card>
-                )
-              },              
-            ]}
-          />
-        </GridItem>
-      </GridContainer>
+      </GridContainer>        
     </div>
   );
 }

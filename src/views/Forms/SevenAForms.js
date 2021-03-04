@@ -95,7 +95,7 @@ export default function SevenAForms() {
                       </CardHeader>
                       <CardBody>
                           <Button color="success" onClick={() => handleSelectForm(form.id)}>Edit Form</Button>
-                          <Button color="info" disabled onClick={() => handlePreviewForm(form)}>Preview</Button>
+                          <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
                       </CardBody>
                       <CardFooter stats>
                         <div className={classes.stats}>

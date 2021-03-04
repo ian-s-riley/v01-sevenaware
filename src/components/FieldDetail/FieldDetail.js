@@ -66,6 +66,8 @@ export default function FieldDetail() {
 
   const [fieldId, setFieldId] = useState(history.location.state.fieldId)
   const [newFieldFormId, setNewFieldFormId] = useState(history.location.state.newFieldFormId)
+  const [formId, setFormId] = useState()
+  const [formJoinId, setFormJoinId] = useState()  
   //console.log('fieldId', fieldId)
   //console.log('newFieldFormId', newFieldFormId)
 
@@ -96,8 +98,11 @@ export default function FieldDetail() {
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
+        console.log(fieldFromAPI)
         setField(fieldFromAPI)    
-        setupOptions(fieldFromAPI)         
+        setupOptions(fieldFromAPI)    
+        setFormId(fieldFromAPI.Form.items[0].FormID)
+        setFormJoinId(fieldFromAPI.Form.items[0].id)             
       }
   }  
 
@@ -128,15 +133,20 @@ export default function FieldDetail() {
     const apiData = await API.graphql({ query: createFieldMutation, variables: { input: field } })
     const fieldFromAPI = apiData.data.createField
 
-    await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+    const formJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
       input:{
         FormID: newFieldFormId, 
         FieldID: fieldFromAPI.id
       }
     })) 
 
-    setNewFieldFormId('')
+    console.log('formJoinFromAPI', formJoinFromAPI.data.createFieldFormJoin.id)
+
+    //setFormId(fieldFromAPI.Form.items[0].FormID)
+    setFormJoinId(formJoinFromAPI.data.createFieldFormJoin.id)
+    setFormId(newFieldFormId)         
     setIsDirty(false)
+    setNewFieldFormId('')
     setFieldId(fieldFromAPI.id) 
   }
 
@@ -171,12 +181,10 @@ export default function FieldDetail() {
     // console.log('delete - form join id', field.Form.items[0].id)    
     // console.log('delete - parent form id', field.Form.items[0].FormID)   
     var result = confirm("Are you sure you want to delete this field?");
-    if (result) {      
-      const formJoinToDelete = field.Form.items[0].id
-      const formId = field.Form.items[0].FormID
-      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinToDelete } }})
-      await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})    
-      history.push("/admin/formdetail", { formId: formId })        
+    if (result) {                
+      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinId } }})
+      await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})   
+      goToForm()            
     }        
   }
 
@@ -186,8 +194,8 @@ export default function FieldDetail() {
       setField({ ...field, [id]: value})      
   }
 
-  function handleCancel() {
-      history.goBack()   
+  function goToForm() {
+      history.push("/admin/formdetail", { formId: formId })   
   }  
 
   const handleSelectFieldType = event => {
@@ -227,6 +235,8 @@ export default function FieldDetail() {
           <Icon>info_outline</Icon>
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {fieldId}</h5>
+        <h5 className={classes.cardTitle}>Form ID: {formId}</h5>
+        <h5 className={classes.cardTitle}>Form Join ID: {formJoinId}</h5>
       </CardHeader>
       <CardBody>
       
@@ -619,7 +629,7 @@ export default function FieldDetail() {
         </GridContainer>
       </CardBody>
       <CardFooter>
-        <Button onClick={handleCancel}>Done</Button>        
+        <Button onClick={goToForm}>Done</Button>        
         {saveButton}     
         {fieldId !== '' && (
         <Button

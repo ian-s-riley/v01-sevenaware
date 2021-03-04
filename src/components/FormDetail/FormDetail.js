@@ -6,6 +6,7 @@ import classnames from "classnames";
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
 import { getForm } from '../../graphql/customQueries';
+import { listSubformFormJoins } from '../../graphql/queries';
 import { 
   createForm as createFormMutation, 
   createSubformFormJoin as createSubformFormJoinMutation,
@@ -69,7 +70,8 @@ export default function FormDetail() {
   const tableCellClasses = classnames(classes.tableCell);
 
   const [formId, setFormId] = useState(history.location.state.formId)
-  const [newFormParentId, setNewFormParentId] = useState(history.location.state.newFormParentId)  
+  const [parentFormId, setParentFormId] = useState(history.location.state.parentFormId)  
+  const [parentFormJoinId, setParentFormJoinId] = useState()  
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
   const [fields, setFields] = useState([])  
@@ -87,6 +89,7 @@ export default function FormDetail() {
 
   useEffect(() => {
     fetchForm()    
+    fetchParentForm()   
   }, [formId])
 
   // useEffect(() => {
@@ -100,16 +103,36 @@ export default function FormDetail() {
   // }, [])
 
   async function fetchForm() {
+      //console.log('fetchForm: formId', formId)
       if (formId === '') {
           //new form, get the parent form we will use
-          setForm({ ...initialFormState, isTopLevel: newFormParentId === '-1' })
+          setForm({ ...initialFormState, isTopLevel: parentFormId === '-1' })
       } else {
         const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});              
         setForm(formFromAPI.data.getForm)            
         setSubforms(formFromAPI.data.getForm.Subform.items)  
         setFields(formFromAPI.data.getForm.Field.items)         
       }
-  }  
+  } 
+  
+  async function fetchParentForm() {    
+    if (parentFormId !== '-1' && formId !== '') {        
+      //get the parent form connection for navigation & delete
+      const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
+        filter: { SubformID: { eq: formId }},
+      }));
+      const parentFormsFromAPI = apiData.data.listSubformFormJoins.items
+      if (parentFormsFromAPI.length === 0) 
+      {
+        setParentFormJoinId('')
+        setParentFormId('-1')
+      } else {
+        const parentFormJoinId = parentFormsFromAPI[0].id
+        setParentFormJoinId(parentFormJoinId)
+        setParentFormId(parentFormsFromAPI[0].FormID)
+      }      
+    }
+} 
 
   // function subscribeCreateField() {
   //   const subscription = API.graphql(graphqlOperation(onCreateField))
@@ -142,31 +165,31 @@ export default function FormDetail() {
   //       }
   //     })
   //     return () => subscription.unsubscribe();
-  // }
+  // }   
 
   async function createForm() {    
     if (!form.name || !form.code) return    
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
-    const formFromAPI = apiData.data.createForm
+    const newFormId = apiData.data.createForm.id
 
     //if not a top level form, add the subform to form join
-    if (newFormParentId !== '-1') {
-      console.log('create Subform', formFromAPI.id)
-      console.log('create for parent form', newFormParentId)
-      await API.graphql(graphqlOperation(createSubformFormJoinMutation,{
+    if (parentFormId !== '-1') {
+      //console.log('create Subform', formFromAPI.id)
+      //console.log('createForm: parent form', parentFormId)
+      const newFormJoinFromAPI = await API.graphql(graphqlOperation(createSubformFormJoinMutation,{
         input:{
-          FormID: newFormParentId, 
-          SubformID: apiData.data.createForm.id
+          FormID: parentFormId, 
+          SubformID: newFormId
         }
-      })) 
+      }))       
+      //console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
+      setParentFormJoinId(newFormJoinFromAPI.data.createSubformFormJoin.id)
     }    
-
-    setNewFormParentId('')
-    setFormId(formFromAPI.id)
+    setFormId(newFormId)
   }
 
   async function updateForm() {
-    console.log('updateForm', form)
+    //('updateForm', form)
     if (!form.name || !form.code) return     
     await API.graphql({ 
                         query: updateFormMutation, 
@@ -191,19 +214,30 @@ export default function FormDetail() {
                     });  
   }  
 
-  async function handleDeleteForm() {
-     console.log('delete - form', form)
-    // console.log('delete - form join id', field.Form.items[0].id)    
-    // console.log('delete - parent form id', field.Form.items[0].FormID)   
-    // var result = confirm("Are you sure you want to delete this form?");
-    // if (result) {      
-    //   const formToDelete = formId
-    //   const formJoinToDelete = field.Form.items[0].id
-    //   const formId = field.Form.items[0].FormID
-    //   await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinToDelete } }})
-    //   await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldToDelete } }})    
-    //   history.push("/admin/formdetail", { formId: formId })        
-    // }        
+  async function handleDeleteForm() {    
+    var result = confirm("Are you sure you want to delete this form?");
+    if (result) {      
+      if (parentFormJoinId !== '') {
+        //delete the join to the parent form
+        await API.graphql({ query: deleteSubformFormJoinMutation, variables: { input: { id: parentFormJoinId } }})
+      }
+
+      //delete this from
+      await API.graphql({ query: deleteFormMutation, variables: { input: { id: formId } }})    
+      goUp()
+    }            
+  }
+
+  function goUp() {
+    console.log('goUp', parentFormId)
+    //if a top level form go to forms list else go to parent form
+    if (parentFormId === '-1') {
+      history.replace("/admin/sevenaforms")
+     } else {
+        setParentFormJoinId('')
+        setParentFormId('')
+        setFormId(parentFormId)
+     } 
   }
 
   function handleChange(e) {
@@ -211,19 +245,17 @@ export default function FormDetail() {
       setForm({ ...form, [id]: value})      
   }
 
-  function handleCancel() {
-    history.push("/admin/sevenaforms")
-    //form.isTopLevel ? history.push("/admin/sevenaforms") : setFormId(form.parentFormId)
-  }  
+  function handleCreateSubform() {
+    setParentFormJoinId('')
+    setParentFormId(formId)
+    setFormId('')
+  } 
 
   async function handleSelectSubform({ id }) { 
+    setParentFormJoinId('')
+    setParentFormId(formId)
     setFormId(id)
-  }  
-
-  function handleCreateSubform() {
-    setNewFormParentId(formId)
-    setFormId('')
-  }  
+  }    
 
   async function handleSelectField({ id }) { 
     history.push("/admin/fielddetail", { fieldId: id }) 
@@ -241,7 +273,8 @@ export default function FormDetail() {
           <Icon>info_outline</Icon>
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {formId}</h5>
-        <p className={classes.cardTitle}>Parent ID: {newFormParentId}</p>
+        <p className={classes.cardTitle}>Parent ID: {parentFormId}</p>
+        <p className={classes.cardTitle}>Parent From Join ID: {parentFormJoinId}</p>
       </CardHeader>
       <CardBody>
       <GridContainer>                    
@@ -414,7 +447,7 @@ export default function FormDetail() {
       </Card>
       <Card>
       <CardFooter>
-        <Button onClick={handleCancel}>Done</Button>        
+        <Button onClick={goUp}>Done</Button>        
         {
         formId === '' ? (
         <Button 
@@ -428,7 +461,10 @@ export default function FormDetail() {
           >Save</Button>
         )
         }     
-        {formId !== '' && (
+        {formId !== '' 
+          && subforms.length == 0 
+          && fields.length == 0
+          && (
         <Button
           onClick={() => handleDeleteForm()}
           justIcon

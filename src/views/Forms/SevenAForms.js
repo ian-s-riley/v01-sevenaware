@@ -46,12 +46,6 @@ export default function SevenAForms() {
     }, []);
   
     async function fetchForms() {
-      //const apiData = await API.graphql({ query: listForms, variables: { filter: {parentFormId: {eq: '-1'}} } });
-      //const formsFromAPI = apiData.data.listForms.items;
-      
-        //        
-        //filter: {isTopLevel: {eq: true}}
-      
       const apiData = await API.graphql(graphqlOperation(listForms, {
         filter: { isTopLevel: { eq: true }},
         sort: {
@@ -60,16 +54,16 @@ export default function SevenAForms() {
         }
       }));
       const formsFromAPI = apiData.data.listForms.items 
-      console.log(formsFromAPI)
+      //console.log(formsFromAPI)
       setForms(formsFromAPI);    
     }
     
     function handleSelectForm(id) { 
-      history.push("/admin/formdetail", { formId: id }) 
+      history.replace("/admin/formdetail", { formId: id, parentFormId: '-1' }) 
     }    
   
     function handleCreateForm() {    
-      history.push("/admin/formDetail", { formId: '', newFormParentId: '-1' })
+      history.replace("/admin/formDetail", { formId: '', parentFormId: '-1' })
     }
   
     function handlePreviewForm({ id }) {    

@@ -22,11 +22,23 @@ export const getForm = /* GraphQL */ `
       Field {
         items {
             Field {
-            code
             id
             name
             order
+            code
+            ref
+            description
             fieldType
+            value
+            defaultValue
+            options
+            userId
+            lenderId
+            label
+            helpText
+            image
+            dox
+            size
             }
             id
         }

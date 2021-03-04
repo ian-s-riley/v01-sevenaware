@@ -14,6 +14,7 @@ import {
   deleteField as deleteFieldMutation, 
   deleteFieldFormJoin as deleteFieldFormJoinMutation,
   updateField as updateFieldMutation,
+  updateFieldFormJoin as updateFieldFormJoinMutation,
 } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -96,7 +97,7 @@ export default function FieldDetail() {
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
-        //console.log(fieldFromAPI)
+        console.log('featchField', fieldFromAPI)
         setField(fieldFromAPI)    
         setupOptions(fieldFromAPI)    
         setFormJoinId(fieldFromAPI.Form.items[0].id)             
@@ -133,7 +134,8 @@ export default function FieldDetail() {
     const formJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
       input:{
         FormID: field.parentFormId, 
-        FieldID: fieldFromAPI.id
+        FieldID: fieldFromAPI.id,
+        order: field.order,
       }
     })) 
 
@@ -166,6 +168,16 @@ export default function FieldDetail() {
                             size: field.size,
                         }} 
                     }); 
+    //update the order of this subform
+    formJoinId !== ''
+    &&
+    await API.graphql({ 
+        query: updateFieldFormJoinMutation, 
+        variables: { input: {
+        id: formJoinId, 
+        order: field.order,
+      }} 
+    });      
     setIsDirty(false)
   }  
 

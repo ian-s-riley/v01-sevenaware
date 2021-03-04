@@ -1,4 +1,5 @@
 type Form @model
+@key (name:"byParentFormId", fields:["parentFormId","order"], queryField: "byParentFormId")
 {
   id: ID!
   name: String!  
@@ -23,6 +24,7 @@ type Form @model
  }
 
 type Field  @model
+@key (name:"byFormId", fields:["parentFormId","order"], queryField: "byFormId")
 {
   id: ID!
 	name: String!
@@ -51,6 +53,7 @@ type FieldFormJoin @model
   id: ID!
   FormID: ID!
   FieldID: ID!
+  order: Int
   Form: Form!   @connection(fields: ["FormID"])      
   Field: Field!  @connection(fields: ["FieldID"])
 }
@@ -62,6 +65,7 @@ type SubformFormJoin @model
   id: ID!
   FormID: ID!
   SubformID: ID!
+  order: Int
   Form: Form!   @connection(fields: ["FormID"])      
   Subform: Form!  @connection(fields: ["SubformID"])
 }

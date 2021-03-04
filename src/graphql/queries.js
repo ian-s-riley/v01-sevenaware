@@ -27,6 +27,7 @@ export const getForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -37,6 +38,7 @@ export const getForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -112,6 +114,7 @@ export const getField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -164,6 +167,7 @@ export const getFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -233,6 +237,7 @@ export const listFieldFormJoins = /* GraphQL */ `
         id
         FormID
         FieldID
+        order
         Form {
           id
           name
@@ -290,6 +295,7 @@ export const getSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name
@@ -366,6 +372,7 @@ export const listSubformFormJoins = /* GraphQL */ `
         id
         FormID
         SubformID
+        order
         Form {
           id
           name
@@ -409,6 +416,101 @@ export const listSubformFormJoins = /* GraphQL */ `
           parentFormId
           createdAt
           updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const byParentFormId = /* GraphQL */ `
+  query ByParentFormId(
+    $parentFormId: String
+    $order: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    byParentFormId(
+      parentFormId: $parentFormId
+      order: $order
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        order
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        parentFormId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const byFormId = /* GraphQL */ `
+  query ByFormId(
+    $parentFormId: String
+    $order: ModelIntKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFieldFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    byFormId(
+      parentFormId: $parentFormId
+      order: $order
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        order
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        parentFormId
+        Form {
+          nextToken
         }
         createdAt
         updatedAt

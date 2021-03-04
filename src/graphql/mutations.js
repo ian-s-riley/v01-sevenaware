@@ -30,6 +30,7 @@ export const createForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -40,6 +41,7 @@ export const createForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -79,6 +81,7 @@ export const updateForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -89,6 +92,7 @@ export const updateForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -128,6 +132,7 @@ export const deleteForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -138,6 +143,7 @@ export const deleteForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -177,6 +183,7 @@ export const createField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -216,6 +223,7 @@ export const updateField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -255,6 +263,7 @@ export const deleteField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -274,6 +283,7 @@ export const createFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -341,6 +351,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -408,6 +419,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -475,6 +487,7 @@ export const createSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name
@@ -545,6 +558,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name
@@ -615,6 +629,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name

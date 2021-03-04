@@ -27,6 +27,7 @@ export const onCreateForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -37,6 +38,7 @@ export const onCreateForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -73,6 +75,7 @@ export const onUpdateForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -83,6 +86,7 @@ export const onUpdateForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -119,6 +123,7 @@ export const onDeleteForm = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -129,6 +134,7 @@ export const onDeleteForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
           createdAt
           updatedAt
         }
@@ -165,6 +171,7 @@ export const onCreateField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -201,6 +208,7 @@ export const onUpdateField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -237,6 +245,7 @@ export const onDeleteField = /* GraphQL */ `
           id
           FormID
           FieldID
+          order
           createdAt
           updatedAt
         }
@@ -253,6 +262,7 @@ export const onCreateFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -317,6 +327,7 @@ export const onUpdateFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -381,6 +392,7 @@ export const onDeleteFieldFormJoin = /* GraphQL */ `
       id
       FormID
       FieldID
+      order
       Form {
         id
         name
@@ -445,6 +457,7 @@ export const onCreateSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name
@@ -512,6 +525,7 @@ export const onUpdateSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name
@@ -579,6 +593,7 @@ export const onDeleteSubformFormJoin = /* GraphQL */ `
       id
       FormID
       SubformID
+      order
       Form {
         id
         name

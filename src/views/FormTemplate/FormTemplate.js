@@ -23,23 +23,17 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
-import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import FixedHelp from "components/FixedHelp/FixedHelp";
 import SevenAField from 'components/SevenAField/SevenAField'
 
 // @material-ui/icons
 import Edit from "@material-ui/icons/Edit";
 import Check from "@material-ui/icons/Check";
 import Info from "@material-ui/icons/Info";
-import LocationOn from "@material-ui/icons/LocationOn";
 import Gavel from "@material-ui/icons/Gavel";
 import HelpOutline from "@material-ui/icons/HelpOutline";
 import Dashboard from "@material-ui/icons/Dashboard";
-import Schedule from "@material-ui/icons/Schedule";
-
-import avatar from "assets/img/help/form-help-icon-01.png";
 
 const styles = {
   cardCategoryWhite: {
@@ -69,8 +63,6 @@ export default function FormTemplate() {
     const tableCellClasses = classnames(classes.tableCell);
  
     const formId = history.location.state.formId
-    const [fixedClasses, setFixedClasses] = useState("dropdown");
-
     const [form, setForm] = useState(initialFormState)
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])

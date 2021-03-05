@@ -59,7 +59,7 @@ const initialFieldState = {
     image: '',
     dox: '',
     size: 6,
-    parentFormId: ''
+    parentFormId: '-1'
 }
 
 export default function FieldDetail() {
@@ -67,7 +67,8 @@ export default function FieldDetail() {
   const classes = useStyles();
 
   const [fieldId, setFieldId] = useState(history.location.state.fieldId)
-  const [formJoinId, setFormJoinId] = useState()  
+  const [parentFormId, setParentFormId] = useState(history.location.state.parentFormId)  
+  const [parentFormJoinId, setParentFormJoinId] = useState()
   //console.log('fieldId', fieldId)
 
 
@@ -93,14 +94,13 @@ export default function FieldDetail() {
 
   async function fetchField() {
       if (fieldId === '') {
-        setField({...initialFieldState, parentFormId: history.location.state.parentFormId})
+        setField({...initialFieldState, parentFormId: parentFormId})
       } else {
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
-        console.log('featchField', fieldFromAPI)
         setField(fieldFromAPI)    
         setupOptions(fieldFromAPI)    
-        setFormJoinId(fieldFromAPI.Form.items[0].id)             
+        setParentFormJoinId(fieldFromAPI.Form.items[0].id)             
       }
   }  
 
@@ -140,7 +140,7 @@ export default function FieldDetail() {
     })) 
 
     //console.log('formJoinFromAPI', formJoinFromAPI.data.createFieldFormJoin.id)
-    setFormJoinId(formJoinFromAPI.data.createFieldFormJoin.id)
+    setParentFormJoinId(formJoinFromAPI.data.createFieldFormJoin.id)
     setIsDirty(false)
     setFieldId(fieldFromAPI.id) 
   }
@@ -166,10 +166,11 @@ export default function FieldDetail() {
                             image: field.image,
                             dox: field.dox,
                             size: field.size,
+                            parentFormId: field.parentFormId
                         }} 
                     }); 
     //update the order of this subform
-    formJoinId !== ''
+    parentFormJoinId !== ''
     &&
     await API.graphql({ 
         query: updateFieldFormJoinMutation, 
@@ -186,7 +187,7 @@ export default function FieldDetail() {
     // console.log('delete - form join id', field.Form.items[0].id)     
     var result = confirm("Are you sure you want to delete this field?");
     if (result) {                
-      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: formJoinId } }})
+      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: parentFormJoinId } }})
       await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})   
       goToForm()            
     }        
@@ -240,7 +241,7 @@ export default function FieldDetail() {
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {fieldId}</h5>
         <h5 className={classes.cardTitle}>Parent Form ID: {field.parentFormId}</h5>
-        <h5 className={classes.cardTitle}>Form Join ID: {formJoinId}</h5>
+        <h5 className={classes.cardTitle}>Form Join ID: {parentFormJoinId}</h5>
       </CardHeader>
       <CardBody>
       

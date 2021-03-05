@@ -18,6 +18,7 @@ export const getForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
+      parentFormId
       Field {
         items {
             Field {

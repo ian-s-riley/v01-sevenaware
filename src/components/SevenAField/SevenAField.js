@@ -122,7 +122,6 @@ export default function SevenAField(props) {
             )
             break
         case 'TextArea':
-            console.log('Text Area')   
             thisField = (
                 <GridItem xs={12} sm={12} md={size}>
                   <CustomInput
@@ -293,7 +292,6 @@ export default function SevenAField(props) {
             )
             break;
         case 'DropDown':
-            console.log('Drop Down Field', field.options)
             thisField = (
                 <GridItem xs={12} sm={12} md={size}>
                     <FormControl

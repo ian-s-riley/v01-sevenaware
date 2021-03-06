@@ -62,7 +62,8 @@ const initialFormState = {
   legalDescription: '',
   dox: '',
 	isComplete: false,
-  parentFormId: '-1'
+  parentFormId: '-1',
+  businessIntelligence: '',
 }
 
 export default function FormDetail() {
@@ -237,7 +238,8 @@ export default function FormDetail() {
                         legalTitle: form.legalTitle,
                         legalDescription: form.legalDescription,
                         dox: form.dox,
-                        parentFormId: form.parentFormId
+                        parentFormId: form.parentFormId,
+                        businessIntelligence: form.businessIntelligence,
                       }} 
                     });  
 
@@ -530,9 +532,7 @@ export default function FormDetail() {
               />
           </GridItem>                           
         </GridContainer>            
-      </CardBody>      
-      </Card>
-      <Card>
+      </CardBody>
       <CardFooter>
         <Button onClick={goUp}>Done</Button>        
         {saveButton}     
@@ -549,7 +549,32 @@ export default function FormDetail() {
           <Cancel className={classes.icons} />
         </Button>   
         )}           
-      </CardFooter>
+      </CardFooter>      
+      </Card>
+
+      <Card>
+      <CardBody>
+      <GridContainer>                    
+          <GridItem xs={12} sm={12} md={12}>
+            <CustomInput
+                labelText="Business Intelligence"
+                id="businessIntelligence"
+                name="businessIntelligence"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  value: form.businessIntelligence,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
+          </GridItem>                           
+        </GridContainer>            
+      </CardBody>            
+      </Card>
+      <Card>      
       </Card>
       {(formId !== '') && (
       <>

@@ -19,6 +19,7 @@ type Form @model
   dox: String
 	isComplete: Boolean
   parentFormId: String!
+  businessIntelligence: String
   Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
   Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
  }
@@ -44,6 +45,7 @@ type Field  @model
 	dox: String
   size: Int
   parentFormId: String!
+  businessIntelligence: String
   Form: [FieldFormJoin]!@connection(keyName: "byField", fields: ["id"])
 }
 

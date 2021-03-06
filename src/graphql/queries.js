@@ -22,6 +22,7 @@ export const getForm = /* GraphQL */ `
       dox
       isComplete
       parentFormId
+      businessIntelligence
       Field {
         items {
           id
@@ -75,6 +76,7 @@ export const listForms = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -109,6 +111,7 @@ export const getField = /* GraphQL */ `
       dox
       size
       parentFormId
+      businessIntelligence
       Form {
         items {
           id
@@ -151,6 +154,7 @@ export const listFields = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }
@@ -187,6 +191,7 @@ export const getFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -215,6 +220,7 @@ export const getFieldFormJoin = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }
@@ -257,6 +263,7 @@ export const listFieldFormJoins = /* GraphQL */ `
           dox
           isComplete
           parentFormId
+          businessIntelligence
           createdAt
           updatedAt
         }
@@ -279,6 +286,7 @@ export const listFieldFormJoins = /* GraphQL */ `
           dox
           size
           parentFormId
+          businessIntelligence
           createdAt
           updatedAt
         }
@@ -315,6 +323,7 @@ export const getSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -343,6 +352,7 @@ export const getSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -392,6 +402,7 @@ export const listSubformFormJoins = /* GraphQL */ `
           dox
           isComplete
           parentFormId
+          businessIntelligence
           createdAt
           updatedAt
         }
@@ -414,6 +425,7 @@ export const listSubformFormJoins = /* GraphQL */ `
           dox
           isComplete
           parentFormId
+          businessIntelligence
           createdAt
           updatedAt
         }
@@ -460,6 +472,7 @@ export const byParentFormId = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -509,6 +522,7 @@ export const byFormId = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }

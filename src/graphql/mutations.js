@@ -25,6 +25,7 @@ export const createForm = /* GraphQL */ `
       dox
       isComplete
       parentFormId
+      businessIntelligence
       Field {
         items {
           id
@@ -76,6 +77,7 @@ export const updateForm = /* GraphQL */ `
       dox
       isComplete
       parentFormId
+      businessIntelligence
       Field {
         items {
           id
@@ -127,6 +129,7 @@ export const deleteForm = /* GraphQL */ `
       dox
       isComplete
       parentFormId
+      businessIntelligence
       Field {
         items {
           id
@@ -178,6 +181,7 @@ export const createField = /* GraphQL */ `
       dox
       size
       parentFormId
+      businessIntelligence
       Form {
         items {
           id
@@ -218,6 +222,7 @@ export const updateField = /* GraphQL */ `
       dox
       size
       parentFormId
+      businessIntelligence
       Form {
         items {
           id
@@ -258,6 +263,7 @@ export const deleteField = /* GraphQL */ `
       dox
       size
       parentFormId
+      businessIntelligence
       Form {
         items {
           id
@@ -303,6 +309,7 @@ export const createFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -331,6 +338,7 @@ export const createFieldFormJoin = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }
@@ -371,6 +379,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -399,6 +408,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }
@@ -439,6 +449,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -467,6 +478,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         dox
         size
         parentFormId
+        businessIntelligence
         Form {
           nextToken
         }
@@ -507,6 +519,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -535,6 +548,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -578,6 +592,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -606,6 +621,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -649,6 +665,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }
@@ -677,6 +694,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         parentFormId
+        businessIntelligence
         Field {
           nextToken
         }

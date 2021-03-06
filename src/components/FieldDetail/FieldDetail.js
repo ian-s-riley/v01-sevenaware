@@ -59,7 +59,8 @@ const initialFieldState = {
     image: '',
     dox: '',
     size: 6,
-    parentFormId: '-1'
+    parentFormId: '-1',
+    businessIntelligence: '',
 }
 
 export default function FieldDetail() {
@@ -166,7 +167,8 @@ export default function FieldDetail() {
                             image: field.image,
                             dox: field.dox,
                             size: field.size,
-                            parentFormId: field.parentFormId
+                            parentFormId: field.parentFormId,
+                            businessIntelligence: field.businessIntelligence,
                         }} 
                     }); 
     //update the order of this subform
@@ -175,7 +177,7 @@ export default function FieldDetail() {
     await API.graphql({ 
         query: updateFieldFormJoinMutation, 
         variables: { input: {
-        id: formJoinId, 
+        id: parentFormJoinId, 
         order: field.order,
       }} 
     });      
@@ -234,6 +236,7 @@ export default function FieldDetail() {
   )
   
   return (
+    <>
     <Card>
       <CardHeader color="info" stats icon>
         <CardIcon color="info">
@@ -648,5 +651,29 @@ export default function FieldDetail() {
         )}
       </CardFooter>
     </Card>
+    <Card>
+      <CardBody>
+
+      <GridContainer>                    
+          <GridItem xs={12} sm={12} md={12}>
+            <CustomInput
+                labelText="Business Intelligence"
+                id="businessIntelligence"
+                name="businessIntelligence"
+                formControlProps={{
+                  fullWidth: true
+                }}
+                inputProps={{
+                  onChange: (event) => handleChange(event),
+                  value: field.businessIntelligence,
+                  multiline: true,
+                  rows: 4
+                }}
+              />
+          </GridItem>                           
+        </GridContainer>            
+      </CardBody>      
+      </Card>
+      </>
   )
 }

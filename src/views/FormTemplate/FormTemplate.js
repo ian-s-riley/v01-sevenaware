@@ -16,6 +16,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Checkbox from "@material-ui/core/Checkbox";
 import NavPills from "components/NavPills/NavPills.js";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 // core components
 import GridItem from "components/Grid/GridItem.js";
@@ -66,6 +67,7 @@ export default function FormTemplate() {
     const [form, setForm] = useState(initialFormState)
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
+    const [incompleteSubforms, setIncompleteSubforms] = useState([])
     const [siblingForms, setSiblingForms] = useState([])
     
 
@@ -105,9 +107,9 @@ export default function FormTemplate() {
         query: byParentFormId, 
         variables: { parentFormId: formId },
       }); 
-      //console.log('fetchSubforms : formsFromAPI', formsFromAPI)
-      const incompleteSubforms = formsFromAPI.data.byParentFormId.items.filter(form => !form.isComplete )
-      setSubforms(formsFromAPI.data.byParentFormId.items)  
+      console.log('fetchSubforms : formsFromAPI', formsFromAPI)
+      setSubforms(formsFromAPI.data.byParentFormId.items)
+      setIncompleteSubforms(formsFromAPI.data.byParentFormId.items.filter(form => !form.isComplete ))  
     } 
 
     async function fetchSiblingForms() {
@@ -124,16 +126,57 @@ export default function FormTemplate() {
       }
     }
 
-    async function handlePublishForm(isComplete) {      
+    async function handlePublishForm() {      
       await API.graphql({ 
                           query: updateFormMutation, 
                           variables: { input: {
                             id: form.id, 
-                            isComplete: isComplete,
+                            isComplete: true,
                           }} 
                         });
       //console.log('handlePublishForm')
       handleNextClick()
+    }
+
+    async function handleUnPublishParentForm(e) {
+      e.preventDefault()
+      if (form.isComplete) {
+        await API.graphql({ 
+          query: updateFormMutation, 
+          variables: { input: {
+            id: formId, 
+            isComplete: false,
+          }} 
+        });
+        setForm({...form, [form.isComplete]: false});
+      }  
+      handleBackClick()
+    };
+
+    async function handleUnPublishForm( { id, isComplete } ) {     
+      //console.log('handleUnPublishForm', id)
+      //console.log('handleUnPublishForm', isComplete) 
+      if (isComplete) {
+        await API.graphql({ 
+          query: updateFormMutation, 
+          variables: { input: {
+            id: id, 
+            isComplete: false,
+          }} 
+        });
+        //update this subform in the store
+        const newSubforms = subforms.map(subform => {
+          if (subform.id === id) {
+            const updatedSubform = {
+              ...subform,
+              isComplete: false,
+            };
+            return updatedSubform;
+          }   
+          return subform;
+        });
+        setSubforms(newSubforms);
+      }
     }
 
     function handleNextClick() {  
@@ -143,15 +186,15 @@ export default function FormTemplate() {
 
       let nextFormId = form.parentFormId
 
-      if (subforms.length > 0) {
+      if (incompleteSubforms.length > 0) {
         //go to the next incomplete subform of this form, if there is one
-        nextFormId = subforms[0].id
-        console.log('handleNextClick: this form has subforms, first incomplete subform:', nextFormId)        
+        nextFormId = incompleteSubforms[0].id    
       } else if (siblingForms.length > 0 && form.parentFormId !== '-1') {
+        //go to the next incomplete sibling form
         nextFormId =  siblingForms[0].id    
       }
 
-      console.log('handleNextClick: nextFormId:', nextFormId)     
+      //console.log('handleNextClick: nextFormId:', nextFormId)     
       if (nextFormId === '-1') {
         history.push("/admin/sevenaforms")
       } else {
@@ -165,11 +208,7 @@ export default function FormTemplate() {
       } else {
         history.push("/admin/formtemplate", { formId: form.parentFormId })
       }
-    }    
-
-    async function handleSelectForm({ id }) { 
-      history.push("/admin/formtemplate", { formId: id })
-    }  
+    }     
 
   return (
     <div>
@@ -204,8 +243,8 @@ export default function FormTemplate() {
                         </CardBody>
                         <CardFooter>
                           <Button color="info" onClick={handleBackClick}>Back</Button>
-                          {form.isComplete ? (<Button onClick={() => handlePublishForm('')}>Unpublish</Button>) : (<Button color="success" onClick={() => handlePublishForm('true')}>Publish</Button>)}
-                          <Button color="info" onClick={handleNextClick}>Next</Button>
+                          {!form.isComplete ? (<Button color="success" onClick={() => handlePublishForm()}>Publish</Button>) : (<span>This form has been completed <a href="#" onClick={handleUnPublishParentForm}>unpublish</a></span>)}
+                          {(incompleteSubforms.length > 0 || siblingForms.length > 0) && (<Button color="info" onClick={handleNextClick}>Next</Button>) }
                         </CardFooter>
                       </Card>
                     )
@@ -228,28 +267,30 @@ export default function FormTemplate() {
                             subforms.map(subform => (
                               <TableRow className={classes.tableRow} key={subform.id}>
                               <TableCell className={tableCellClasses}>
+                              <FormControlLabel
+                                control={
                                   <Checkbox
-                                    checked={subform.isComplete !== ''}
-                                    checkedIcon={<Check className={classes.checkedIcon} />}
+                                    checked={subform.isComplete}
+                                    onClick={ () => handleUnPublishForm(subform) }
+                                    checkedIcon={
+                                      <Check className={classes.checkedIcon} />
+                                    }
                                     icon={<Check className={classes.uncheckedIcon} />}
                                     classes={{
                                       checked: classes.checked,
-                                      root: classes.root
+                                      root: classes.checkRoot
                                     }}
                                   />
+                                }
+                                classes={{
+                                  label: classes.label,
+                                  root: classes.labelRoot
+                                }}
+                                label="Complete"
+                              />
                                 </TableCell>
                                 <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                                <TableCell className={tableCellClasses}>{subform.description}</TableCell>
-                                <TableCell className={tableCellClasses}>
-                                <Button
-                                    onClick={() => handleSelectForm(subform)}
-                                    justIcon
-                                    color="success"
-                                    className={classes.marginRight}
-                                  >
-                                    <Edit className={classes.icons} />
-                                  </Button>
-                                </TableCell>
+                                <TableCell className={tableCellClasses}>{subform.id}</TableCell>
                             </TableRow>
                             ))
                           }

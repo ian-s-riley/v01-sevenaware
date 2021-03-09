@@ -47,7 +47,7 @@ export default function SevenAForms() {
   
     async function fetchForms() {
       const apiData = await API.graphql(graphqlOperation(listForms, {
-        filter: { parentFormId: { eq: '-1' }},
+        filter: { isTopLevel: { eq: true }},
         sort: {
           direction: 'asc',
           field: 'name'
@@ -58,13 +58,13 @@ export default function SevenAForms() {
       setForms(formsFromAPI);    
     }
     
-    function handleSelectForm(id) { 
-      history.replace("/admin/formdetail", { formId: id }) 
+    function handleSelectForm({ id }) { 
+      history.replace("/admin/formDetail", { formId: id, parentFormId: '', parentFormJoinId: '' })
     }    
   
     function handleCreateForm() {    
       //create a new top level form
-      history.replace("/admin/formDetail", { formId: '', parentFormId: '-1' })
+      history.replace("/admin/formDetail", { formId: '', parentFormId: '', parentFormJoinId: '' })
     }
   
     function handlePreviewForm({ id }) {    
@@ -95,7 +95,7 @@ export default function SevenAForms() {
                       </h3>
                       </CardHeader>
                       <CardBody>
-                          <Button color="success" onClick={() => handleSelectForm(form.id)}>Edit Form</Button>
+                          <Button color="success" onClick={() => handleSelectForm(form)}>Edit Form</Button>
                           <Button color="info" onClick={() => handlePreviewForm(form)}>Preview</Button>
                       </CardBody>
                       <CardFooter stats>

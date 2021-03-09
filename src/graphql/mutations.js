@@ -24,6 +24,7 @@ export const createForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
+      isTopLevel
       parentFormId
       businessIntelligence
       Field {
@@ -76,6 +77,7 @@ export const updateForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
+      isTopLevel
       parentFormId
       businessIntelligence
       Field {
@@ -128,6 +130,7 @@ export const deleteForm = /* GraphQL */ `
       legalDescription
       dox
       isComplete
+      isTopLevel
       parentFormId
       businessIntelligence
       Field {
@@ -308,6 +311,7 @@ export const createFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -378,6 +382,7 @@ export const updateFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -448,6 +453,7 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -518,6 +524,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -547,6 +554,7 @@ export const createSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -591,6 +599,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -620,6 +629,7 @@ export const updateSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -664,6 +674,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {
@@ -693,6 +704,7 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         legalDescription
         dox
         isComplete
+        isTopLevel
         parentFormId
         businessIntelligence
         Field {

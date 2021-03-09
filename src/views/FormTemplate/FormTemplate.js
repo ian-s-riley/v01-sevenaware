@@ -5,7 +5,7 @@ import classnames from "classnames";
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
 import { getForm } from '../../graphql/customQueries';
-import { byFormId, byParentFormId } from '../../graphql/queries';
+import { fieldsByForm } from '../../graphql/queries';
 import { updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -56,7 +56,7 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles); 
-const initialFormState = { name: '', parentFormId: '-1' }
+const initialFormState = { name: '' }
 
 export default function FormTemplate() {
     const history = useHistory();
@@ -94,7 +94,7 @@ export default function FormTemplate() {
 
     async function fetchFields() {
       const fieldsFromAPI = await API.graphql({ 
-        query: byFormId, 
+        query: fieldsByForm, 
         variables: { parentFormId: formId },
       }); 
       //console.log('fetchFields: fieldsFromAPI', fieldsFromAPI)                     
@@ -103,27 +103,27 @@ export default function FormTemplate() {
 
     async function fetchSubforms() {
       //console.log('fetchSubforms : formId', formId)
-      const formsFromAPI = await API.graphql({ 
-        query: byParentFormId, 
-        variables: { parentFormId: formId },
-      }); 
-      console.log('fetchSubforms : formsFromAPI', formsFromAPI)
-      setSubforms(formsFromAPI.data.byParentFormId.items)
-      setIncompleteSubforms(formsFromAPI.data.byParentFormId.items.filter(form => !form.isComplete ))  
+      // const formsFromAPI = await API.graphql({ 
+      //   query: byParentFormId, 
+      //   variables: { parentFormId: formId },
+      // }); 
+      // console.log('fetchSubforms : formsFromAPI', formsFromAPI)
+      // setSubforms(formsFromAPI.data.byParentFormId.items)
+      // setIncompleteSubforms(formsFromAPI.data.byParentFormId.items.filter(form => !form.isComplete ))  
     } 
 
     async function fetchSiblingForms() {
-      if (form.parentFormId !== '-1')
-        {
-          const formsFromAPI = await API.graphql({ 
-            query: byParentFormId, 
-            variables: { parentFormId: form.parentFormId },
-          }); 
+      // if (form.parentFormId !== '-1')
+      //   {
+      //     const formsFromAPI = await API.graphql({ 
+      //       query: byParentFormId, 
+      //       variables: { parentFormId: form.parentFormId },
+      //     }); 
 
-          const incompleteSiblingForms = formsFromAPI.data.byParentFormId.items.filter(form => form.id != formId && !form.isComplete )
-          //console.log('incompleteSiblingForms', incompleteSiblingForms)
-          setSiblingForms(incompleteSiblingForms)       
-      }
+      //     const incompleteSiblingForms = formsFromAPI.data.byParentFormId.items.filter(form => form.id != formId && !form.isComplete )
+      //     //console.log('incompleteSiblingForms', incompleteSiblingForms)
+      //     setSiblingForms(incompleteSiblingForms)       
+      // }
     }
 
     async function handlePublishForm() {      

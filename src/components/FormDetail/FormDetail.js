@@ -5,8 +5,7 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { getForm } from '../../graphql/customQueries';
-import { listSubformFormJoins, byParentFormId, byFormId } from '../../graphql/queries';
+import { getForm, listSubformFormJoins, fieldsByForm, formsByForm } from '../../graphql/queries';
 import { 
   createForm as createFormMutation, 
   createSubformFormJoin as createSubformFormJoinMutation,
@@ -62,8 +61,9 @@ const initialFormState = {
   legalDescription: '',
   dox: '',
 	isComplete: false,
-  parentFormId: '-1',
-  businessIntelligence: '',
+  isTopLevel: true,
+  parentFormId: '',
+  businessIntelligence: '',  
 }
 
 export default function FormDetail() {
@@ -73,10 +73,11 @@ export default function FormDetail() {
 
   const [formId, setFormId] = useState(history.location.state.formId)
   const [parentFormId, setParentFormId] = useState(history.location.state.parentFormId)  
-  const [parentFormJoinId, setParentFormJoinId] = useState()  
+  const [parentFormJoinId, setParentFormJoinId] = useState(history.location.state.parentFormJoinId)  
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
   const [fields, setFields] = useState([])  
+  const [order, setOrder] = useState(10)  
   const [isDirty, setIsDirty] = useState(false)
 
   useEffect(() => {
@@ -91,8 +92,7 @@ export default function FormDetail() {
   });
 
   useEffect(() => {
-    fetchForm()    
-    fetchParentFormJoin()   
+    fetchForm()     
   }, [formId])
 
   // useEffect(() => {
@@ -110,53 +110,40 @@ export default function FormDetail() {
       //console.log('fetchForm: parentFormId', parentFormId)
       if (formId === '') {
           //new form, get the parent form we will use
-          setForm({ ...initialFormState, parentFormId: parentFormId })
+          setForm({ ...initialFormState, isTopLevel: parentFormId === '' })
       } else {
         const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});         
         //console.log('fetchForm: formFromAPI', formFromAPI)    
         setForm(formFromAPI.data.getForm)       
-                         
-        //from @connection/join - can't figure out how to sort these by order yet
-        //setSubforms(formFromAPI.data.getForm.Subform.items)  
-        //setFields(formFromAPI.data.getForm.Field.items)  
         fetchSubforms()  
         fetchFields()     
+
+        //get the order of this form from the form/subform join
+        const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
+          filter: { SubformID: { eq: formId }},
+        }));
+        (apiData.data.listSubformFormJoins.items.length > 0) 
+        ? setOrder(apiData.data.listSubformFormJoins.items[0].order) 
+        : setOrder(10)
       }
   } 
   
-  async function fetchParentFormJoin() {    
-    if (parentFormId !== '-1' && formId !== '') {        
-      //get the parent form connection for delete
-      const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
-        filter: { SubformID: { eq: formId }},
-      }));
-      const parentFormsFromAPI = apiData.data.listSubformFormJoins.items
-      if (parentFormsFromAPI.length === 0) 
-      {
-        setParentFormJoinId('')
-        setParentFormId('-1')
-      } else {
-        setParentFormJoinId(parentFormsFromAPI[0].id)
-        setParentFormId(parentFormsFromAPI[0].FormID)
-      }      
-    }
-  }
-  
   async function fetchSubforms() {
     const formsFromAPI = await API.graphql({ 
-      query: byParentFormId, 
-      variables: { parentFormId: formId },
+      query: formsByForm, 
+      variables: { FormID: formId },
     }); 
-    setSubforms(formsFromAPI.data.byParentFormId.items)  
+    //console.log('formsFromAPI.data.formsByForm.items',formsFromAPI.data.formsByForm.items)
+    setSubforms(formsFromAPI.data.formsByForm.items)  
   } 
 
   async function fetchFields() {
     const fieldsFromAPI = await API.graphql({ 
-      query: byFormId, 
-      variables: { parentFormId: formId },
+      query: fieldsByForm, 
+      variables: { FormID: formId },
     }); 
-    //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
-    setFields(fieldsFromAPI.data.byFormId.items)  
+    console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+    setFields(fieldsFromAPI.data.fieldsByForm.items)  
   } 
 
   // function subscribeCreateField() {
@@ -197,16 +184,13 @@ export default function FormDetail() {
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const newFormId = apiData.data.createForm.id
 
-    console.log('create form', apiData.data.createForm.id)
-    console.log('createForm: parent form', parentFormId)
-
     //if not a top level form, add the subform to form join
-    if (parentFormId !== '-1') {      
+    if (parentFormId !== '') {      
       const newFormJoinFromAPI = await API.graphql(graphqlOperation(createSubformFormJoinMutation,{
         input:{
           FormID: parentFormId, 
           SubformID: newFormId,
-          order: form.order
+          order: order
         }
       }))       
       //console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
@@ -224,7 +208,6 @@ export default function FormDetail() {
                         variables: { input: {
                         id: form.id, 
                         name: form.name,  
-                        order: form.order,
                         code: form.code,
                         ref: form.ref,	
                         image: form.image,
@@ -238,7 +221,6 @@ export default function FormDetail() {
                         legalTitle: form.legalTitle,
                         legalDescription: form.legalDescription,
                         dox: form.dox,
-                        parentFormId: form.parentFormId,
                         businessIntelligence: form.businessIntelligence,
                       }} 
                     });  
@@ -250,7 +232,7 @@ export default function FormDetail() {
                         query: updateSubformFormJoinMutation, 
                         variables: { input: {
                         id: parentFormJoinId, 
-                        order: form.order,
+                        order: order,
                       }} 
       });  
       setIsDirty(false)
@@ -259,26 +241,57 @@ export default function FormDetail() {
   async function handleDeleteForm() {    
     var result = confirm("Are you sure you want to delete this form?");
     if (result) {      
-      if (parentFormJoinId !== '' && parentFormId !== '-1') {
+      if (parentFormId !== '') {
+        //get the details for the parent form before we delete the connection
+        const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
+          filter: { SubformID: { eq: parentFormId }},
+        }));
+        const parentFormsFromAPI = apiData.data.listSubformFormJoins.items        
+
         //delete the join to the parent form
         await API.graphql({ query: deleteSubformFormJoinMutation, variables: { input: { id: parentFormJoinId } }})
-      }
+        //delete this form
+        await API.graphql({ query: deleteFormMutation, variables: { input: { id: formId } }})
 
-      //delete this from
-      await API.graphql({ query: deleteFormMutation, variables: { input: { id: formId } }})    
-      goUp()
+        if (parentFormsFromAPI.length > 0) {
+          setParentFormJoinId(parentFormsFromAPI[0].id)
+          setParentFormId(parentFormsFromAPI[0].FormID)    
+          setFormId(parentFormId)
+        } else {
+          setParentFormJoinId('')
+          setParentFormId('')    
+          setFormId(parentFormId)
+        }   
+      } else {
+        //delete this form
+        await API.graphql({ query: deleteFormMutation, variables: { input: { id: formId } }})
+        //go to the forms page
+        history.replace("/admin/sevenaforms")
+      }                
     }            
   }
 
-  function goUp() {
-    console.log('goUp', parentFormId)
+  async function goUp() {
+    console.log('goUp : parentFormId', parentFormId)
     //if a top level form go to forms list else go to parent form
-    if (parentFormId === '-1') {
+    if (parentFormId === '') {
       history.replace("/admin/sevenaforms")
      } else {
-        setParentFormJoinId('')
-        setParentFormId('')
-        setFormId(parentFormId)
+        //get the details for the parent form and go to that form
+        const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
+          filter: { SubformID: { eq: parentFormId }},
+        }));        
+        const parentFormsFromAPI = apiData.data.listSubformFormJoins.items
+        //console.log('goUp: parentFormsFromAPI', parentFormsFromAPI)
+        if (parentFormsFromAPI.length > 0) {
+          setParentFormJoinId(parentFormsFromAPI[0].id)
+          setParentFormId(parentFormsFromAPI[0].FormID)    
+          setFormId(parentFormId)
+        } else {
+          setParentFormJoinId('')
+          setParentFormId('')    
+          setFormId(parentFormId)
+        }        
      } 
   }
 
@@ -288,24 +301,37 @@ export default function FormDetail() {
       setForm({ ...form, [id]: value})      
   }
 
+  function handleChangeOrder(e) {
+    const {id, value} = e.currentTarget;
+    setIsDirty(true)
+    setOrder(value)
+  }
+
   function handleCreateSubform() {
     setParentFormJoinId('')
     setParentFormId(formId)
+    setOrder(10)
     setFormId('')
   } 
 
-  async function handleSelectSubform({ id }) { 
-    setParentFormJoinId('')
-    setParentFormId('')
-    setFormId(id)
+  async function handleSelectSubform(subformId, nextParentFormJoinId, nextOrder) { 
+    //console.log('handleSelectSubform: subformId', subformId)
+    //console.log('handleSelectSubform: nextParentFormId', nextParentFormId)
+    //console.log('handleSelectSubform: nextParentFormJoinId', nextParentFormJoinId)
+    console.log('handleSelectSubform: nextOrder', nextOrder)
+    setOrder(nextOrder)
+    setParentFormJoinId(nextParentFormJoinId)    
+    setParentFormId(formId)
+    setFormId(subformId)
   }    
 
-  async function handleSelectField({ id }) { 
-    history.push("/admin/fielddetail", { fieldId: id }) 
+  async function handleSelectField(field) { 
+    //console.log('handleSelectField: field', field)
+    history.push("/admin/fielddetail", { fieldId: field.FieldID, fieldJoinId: field.id, order: field.order, formId: formId, parentFormId: parentFormId, parentFormJoinId: parentFormJoinId }) 
   }  
 
   function handleCreateField() {
-    history.push("/admin/fielddetail", { fieldId: '', parentFormId: formId }) 
+    history.push("/admin/fielddetail", { fieldId: '', formId: formId, formJoinId: '', order: 10, parentFormId: parentFormId, parentFormJoinId: parentFormJoinId }) 
   }    
 
   const saveButton = (
@@ -347,6 +373,7 @@ export default function FormDetail() {
         </CardIcon>
         <h5 className={classes.cardTitle}>ID: {formId}</h5>
         <p className={classes.cardTitle}>Parent ID: {parentFormId}</p>
+        <p className={classes.cardTitle}>Parent Form Join ID: {parentFormId}</p>
       </CardHeader>
       <CardBody>
       <GridContainer>                            
@@ -387,8 +414,8 @@ export default function FormDetail() {
                 fullWidth: true
               }}
               inputProps={{
-                onChange: (event) => handleChange(event),
-                value: form.order,                
+                onChange: (event) => handleChangeOrder(event),
+                value: order,                
               }}                           
             />
           </GridItem>
@@ -604,14 +631,14 @@ export default function FormDetail() {
                             </TableCell> 
                           <TableCell className={tableCellClasses}>Order</TableCell>
                           <TableCell className={tableCellClasses}>Subform</TableCell>
-                          <TableCell className={tableCellClasses}>Description</TableCell>                                                 
+                          <TableCell className={tableCellClasses}>Join ID</TableCell>                                                 
                         </TableRow>
                       {
                         subforms.map(subform => (
-                          <TableRow className={classes.tableRow} key={subform.id}>
+                          <TableRow className={classes.tableRow} key={subform.Subform.id}>
                           <TableCell className={tableCellClasses}>
                                 <Button
-                                  onClick={() => handleSelectSubform(subform)}
+                                  onClick={() => handleSelectSubform(subform.Subform.id, subform.id, subform.order)}
                                   justIcon
                                   color="success"
                                   className={classes.marginRight}
@@ -620,8 +647,8 @@ export default function FormDetail() {
                                 </Button>  
                             </TableCell> 
                             <TableCell className={tableCellClasses}>{subform.order}</TableCell>                                                       
-                            <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{subform.description}</TableCell>                                                                                                                   
+                            <TableCell className={tableCellClasses}>{subform.Subform.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{subform.id}</TableCell>                                                                                                                   
                         </TableRow>
                         ))
                       }
@@ -669,7 +696,7 @@ export default function FormDetail() {
                         </TableRow>
                       {
                         fields.map(field => (
-                          <TableRow className={classes.tableRow} key={field.id}>                  
+                          <TableRow className={classes.tableRow} key={field.Field.id}>                  
                           <TableCell className={tableCellClasses}>
                               <Button
                                 onClick={() => handleSelectField(field)}
@@ -681,8 +708,8 @@ export default function FormDetail() {
                               </Button>                                                                                              
                             </TableCell>           
                           <TableCell className={tableCellClasses}>{field.order}</TableCell>                                                      
-                            <TableCell className={tableCellClasses}>{field.name}</TableCell>
-                            <TableCell className={tableCellClasses}>{field.fieldType}</TableCell>                                                                                
+                            <TableCell className={tableCellClasses}>{field.Field.name}</TableCell>
+                            <TableCell className={tableCellClasses}>{field.Field.fieldType}</TableCell>                                                                                
                         </TableRow>
                         ))
                       }

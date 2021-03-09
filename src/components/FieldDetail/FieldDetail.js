@@ -59,7 +59,7 @@ const initialFieldState = {
     image: '',
     dox: '',
     size: 6,
-    parentFormId: '-1',
+    parentFormId: '',
     businessIntelligence: '',
 }
 
@@ -68,14 +68,16 @@ export default function FieldDetail() {
   const classes = useStyles();
 
   const [fieldId, setFieldId] = useState(history.location.state.fieldId)
-  const [parentFormId, setParentFormId] = useState(history.location.state.parentFormId)  
-  const [parentFormJoinId, setParentFormJoinId] = useState()
+  const [fieldJoinId, setFieldJoinId] = useState(history.location.state.fieldJoinId)
+  const formId = history.location.state.formId
+  const parentFormId = history.location.state.parentFormId
+  const parentFormJoinId = history.location.state.parentFormJoinId
   //console.log('fieldId', fieldId)
-
 
   const [field, setField] = useState(initialFieldState)
   const [optionsDisabled, setOptionsDisabled] = useState(true)
   const [options, setOptions] = useState([])
+  const [order, setOrder] = useState(history.location.state.order)  
   const [isDirty, setIsDirty] = useState(false)
 
   useEffect(() => {
@@ -94,14 +96,13 @@ export default function FieldDetail() {
   }, [])
 
   async function fetchField() {
-      if (fieldId === '') {
-        setField({...initialFieldState, parentFormId: parentFormId})
-      } else {
+      console.log('fetchField : fieldId', fieldId)
+      if (fieldId !== '') {        
         const apiData = await API.graphql({ query: getField, variables: { id: fieldId  }});       
         const fieldFromAPI = apiData.data.getField
+        console.log('fetchField : fieldFromAPI', fieldFromAPI)
         setField(fieldFromAPI)    
         setupOptions(fieldFromAPI)    
-        setParentFormJoinId(fieldFromAPI.Form.items[0].id)             
       }
   }  
 
@@ -128,20 +129,21 @@ export default function FieldDetail() {
 
   async function createField() {
     if (!field.name || !field.code) return
-    console.log('createField: field', field)
+    //console.log('createField: field', field)
     const apiData = await API.graphql({ query: createFieldMutation, variables: { input: field } })
     const fieldFromAPI = apiData.data.createField
 
-    const formJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+    //console.log('createField  - fieldFromAPI', fieldFromAPI)
+    const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
       input:{
-        FormID: field.parentFormId, 
+        FormID: formId, 
         FieldID: fieldFromAPI.id,
-        order: field.order,
+        order: order,
       }
     })) 
 
-    //console.log('formJoinFromAPI', formJoinFromAPI.data.createFieldFormJoin.id)
-    setParentFormJoinId(formJoinFromAPI.data.createFieldFormJoin.id)
+    // //console.log('formJoinFromAPI', formJoinFromAPI.data.createFieldFormJoin.id)
+    setFieldJoinId(fieldJoinFromAPI.data.createFieldFormJoin.id)
     setIsDirty(false)
     setFieldId(fieldFromAPI.id) 
   }
@@ -154,7 +156,6 @@ export default function FieldDetail() {
                         variables: { input: {
                             id: field.id, 
                             name: field.name,
-                            order: field.order,
                             code: field.code,
                             ref: field.ref,
                             description: field.description,
@@ -167,18 +168,17 @@ export default function FieldDetail() {
                             image: field.image,
                             dox: field.dox,
                             size: field.size,
-                            parentFormId: field.parentFormId,
                             businessIntelligence: field.businessIntelligence,
                         }} 
                     }); 
     //update the order of this subform
-    parentFormJoinId !== ''
+    fieldJoinId !== ''
     &&
     await API.graphql({ 
         query: updateFieldFormJoinMutation, 
         variables: { input: {
-        id: parentFormJoinId, 
-        order: field.order,
+        id: fieldJoinId, 
+        order: order,
       }} 
     });      
     setIsDirty(false)
@@ -189,7 +189,7 @@ export default function FieldDetail() {
     // console.log('delete - form join id', field.Form.items[0].id)     
     var result = confirm("Are you sure you want to delete this field?");
     if (result) {                
-      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: parentFormJoinId } }})
+      await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: fieldJoinId } }})
       await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})   
       goToForm()            
     }        
@@ -201,8 +201,14 @@ export default function FieldDetail() {
       setField({ ...field, [id]: value})      
   }
 
+  function handleChangeOrder(e) {
+    const {id, value} = e.currentTarget;
+    setIsDirty(true)
+    setOrder(value)
+  }
+
   function goToForm() {
-      history.push("/admin/formdetail", { formId: field.parentFormId })   
+      history.push("/admin/formdetail", { formId: formId, parentFormId: parentFormId, parentFormJoinId: parentFormJoinId })   
   }  
 
   const handleSelectFieldType = event => {
@@ -225,13 +231,13 @@ export default function FieldDetail() {
       <Button 
         onClick={handleSaveClick}
         color="success"
-      >{field.id === '' ? 'Create New Field' : 'Save'}</Button>
+      >{fieldId === '' ? 'Create New Field' : 'Save'}</Button>
       ) : (
         <Button 
         onClick={handleSaveClick}
         color="success"
         disabled
-      >{field.id === '' ? 'Create New Field' : 'Save'}</Button>
+      >{fieldId === '' ? 'Create New Field' : 'Save'}</Button>
       )
   )
   
@@ -242,9 +248,11 @@ export default function FieldDetail() {
         <CardIcon color="info">
           <Icon>info_outline</Icon>
         </CardIcon>
-        <h5 className={classes.cardTitle}>ID: {fieldId}</h5>
-        <h5 className={classes.cardTitle}>Parent Form ID: {field.parentFormId}</h5>
-        <h5 className={classes.cardTitle}>Form Join ID: {parentFormJoinId}</h5>
+        <h5 className={classes.cardTitle}>Field ID: {fieldId}</h5>
+        <h5 className={classes.cardTitle}>Form ID: {formId}</h5>
+        <h5 className={classes.cardTitle}>Form Join ID: {fieldJoinId}</h5>
+        <h5 className={classes.cardTitle}>Parent Form ID: {parentFormId}</h5>
+        <h5 className={classes.cardTitle}>Parent Form Join ID: {parentFormJoinId}</h5>
       </CardHeader>
       <CardBody>
       
@@ -258,8 +266,8 @@ export default function FieldDetail() {
                 fullWidth: true
               }}
               inputProps={{
-                onChange: (event) => handleChange(event),
-                value: field.order,                
+                onChange: (event) => handleChangeOrder(event),
+                value: order,                
               }}                           
             />
           </GridItem>

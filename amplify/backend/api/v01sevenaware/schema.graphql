@@ -1,9 +1,8 @@
 type Form @model
-@key (name:"byParentFormId", fields:["parentFormId","order"], queryField: "byParentFormId")
 {
   id: ID!
   name: String!  
-  order: Int!
+  order: Int
 	code: String
   ref: String	
   image: String
@@ -18,18 +17,18 @@ type Form @model
   legalDescription: String
   dox: String
 	isComplete: Boolean
-  parentFormId: String!
+  isTopLevel: Boolean
+  parentFormId: String
   businessIntelligence: String
   Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
   Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
  }
 
 type Field  @model
-@key (name:"byFormId", fields:["parentFormId","order"], queryField: "byFormId")
 {
   id: ID!
 	name: String!
-  order: Int!
+  order: Int
 	code: String
   ref: String
 	description: String
@@ -40,18 +39,20 @@ type Field  @model
 	userId: String
 	lenderId: String
 	label: String
-	helpText: String
+	helpText: String 
   image: String
 	dox: String
   size: Int
-  parentFormId: String!
+  parentFormId: String
   businessIntelligence: String
   Form: [FieldFormJoin]!@connection(keyName: "byField", fields: ["id"])
 }
 
 type FieldFormJoin @model
 @key(name: "byForm", fields: ["FormID", "FieldID"])
-@key(name: "byField", fields: ["FieldID", "FormID"]){
+@key(name: "byField", fields: ["FieldID", "FormID"])
+@key(name:"fieldsByForm", fields:["FormID", "order"], queryField: "fieldsByForm")
+{
   id: ID!
   FormID: ID!
   FieldID: ID!
@@ -63,6 +64,7 @@ type FieldFormJoin @model
 type SubformFormJoin @model
 @key(name: "byForm", fields: ["FormID", "SubformID"])
 @key(name: "bySubform", fields: ["SubformID", "FormID"])
+@key(name:"formsByForm", fields:["FormID", "order"], queryField: "formsByForm")
 {
   id: ID!
   FormID: ID!

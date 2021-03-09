@@ -1,6 +1,6 @@
 projects:
   v01sevenaware:
-    schemaPath: src/graphql/schema.json
+    schemaPath: amplify/backend/api/v01sevenaware/build/schema.graphql
     includes:
       - src/graphql/**/*.js
     excludes:

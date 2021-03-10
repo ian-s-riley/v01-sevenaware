@@ -44,7 +44,6 @@ const useStyles = makeStyles(styles);
 
 const initialFieldState = { 
     name: '',
-    order: 10,
     code: '',
     ref: '',
     description: '',
@@ -59,7 +58,6 @@ const initialFieldState = {
     image: '',
     dox: '',
     size: 6,
-    parentFormId: '',
     businessIntelligence: '',
 }
 

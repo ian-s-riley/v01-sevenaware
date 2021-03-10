@@ -2,7 +2,6 @@ type Form @model
 {
   id: ID!
   name: String!  
-  order: Int
 	code: String
   ref: String	
   image: String
@@ -18,7 +17,6 @@ type Form @model
   dox: String
 	isComplete: Boolean
   isTopLevel: Boolean
-  parentFormId: String
   businessIntelligence: String
   Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
   Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
@@ -28,7 +26,6 @@ type Field  @model
 {
   id: ID!
 	name: String!
-  order: Int
 	code: String
   ref: String
 	description: String
@@ -43,7 +40,6 @@ type Field  @model
   image: String
 	dox: String
   size: Int
-  parentFormId: String
   businessIntelligence: String
   Form: [FieldFormJoin]!@connection(keyName: "byField", fields: ["id"])
 }

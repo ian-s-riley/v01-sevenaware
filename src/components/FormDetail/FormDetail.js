@@ -46,7 +46,6 @@ const useStyles = makeStyles(styles);
 
 const initialFormState = { 
   name: '',  
-  order: 10,
 	code: '',
   ref: '',	
   image: '',
@@ -62,7 +61,6 @@ const initialFormState = {
   dox: '',
 	isComplete: false,
   isTopLevel: true,
-  parentFormId: '',
   businessIntelligence: '',  
 }
 

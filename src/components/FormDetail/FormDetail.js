@@ -43,6 +43,9 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import InputLabel from "@material-ui/core/InputLabel";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
 const useStyles = makeStyles(styles);
@@ -80,6 +83,7 @@ export default function FormDetail() {
   const [fields, setFields] = useState([])  
   const [allFields, setAllFields] = useState([])  
   const [order, setOrder] = useState(10)  
+  const [newFieldOrder, setNewFieldOrder] = useState(10)  
   const [isDirty, setIsDirty] = useState(false)
   const [fieldSelect, setFieldSelect] = useState("");
 
@@ -109,7 +113,7 @@ export default function FormDetail() {
   // }, [])
 
   async function fetchForm() {
-      //console.log('fetchForm: formId', formId)
+      console.log('fetchForm: formId', formId)
       //console.log('fetchForm: parentFormId', parentFormId)
       if (formId === '') {
           //new form, get the parent form we will use
@@ -145,14 +149,14 @@ export default function FormDetail() {
       query: fieldsByForm, 
       variables: { FormID: formId },
     }); 
-    //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+    console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
     setFields(fieldsFromAPI.data.fieldsByForm.items)  
 
 
     const allFieldsFromAPI = await API.graphql({ 
       query: listFields, 
     }); 
-    console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
+    //console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
     setAllFields(allFieldsFromAPI.data.listFields.items)
   } 
 
@@ -314,9 +318,17 @@ export default function FormDetail() {
 
   function handleChangeOrder(e) {
     const {id, value} = e.currentTarget;
+    //console.log('handleChangeOrder : id', id)
+    //console.log('handleChangeOrder : value', value)
     setIsDirty(true)
     setOrder(value)
   }
+
+  function handleChangeNewFieldOrder(e) {
+    const {id, value} = e.currentTarget;
+    setNewFieldOrder(value)
+  }
+
 
   function handleCreateSubform() {
     setParentFormJoinId('')
@@ -349,17 +361,21 @@ export default function FormDetail() {
       setFieldSelect(event.target.value);
   }
 
-  async function handleSelectExistingField() { 
-    console.log('handleSelectExistingField: field', fieldSelect)
-    const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
-      input:{
-        FormID: formId, 
-        FieldID: fieldSelect,
-        order: 10,
-      }
-    }))
-    console.log('handleSelectExistingField: fieldJoinFromAPI', fieldJoinFromAPI)
-    //setFields(...fields, fieldJoinFromAPI.data.fieldSelect)
+  async function handleAddExistingField() { 
+    //console.log('handleAddExistingField: field', fieldSelect)
+    if (fieldSelect !== '') {
+      const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+        input:{
+          FormID: formId, 
+          FieldID: fieldSelect,
+          order: newFieldOrder,
+        }
+      }))
+      console.log('handleAddExistingField: fieldJoinFromAPI', fieldJoinFromAPI)
+      setNewFieldOrder(10)
+      setFieldSelect('')
+      setFields([...fields, fieldJoinFromAPI.data.createFieldFormJoin])
+    }
   } 
 
   const saveButton = (
@@ -744,51 +760,78 @@ export default function FormDetail() {
                       <TableRow>                          
                         <TableCell className={tableCellClasses}>
                           <Button
-                            onClick={handleSelectExistingField}
+                            onClick={handleAddExistingField}
                             justIcon
                             color="rose"
                             >
                             <Add className={classes.icons} />
                           </Button>
                           </TableCell>
-                          <TableCell className={tableCellClasses} colSpan={3}>
-                            <Select
-                                MenuProps={{
-                                className: classes.selectMenu
-                                }}
-                                classes={{
-                                select: classes.select
-                                }}
-                                value={fieldSelect}
-                                onChange={handleFieldSelect}
-                                inputProps={{
-                                    name: 'selectField',
-                                    id: 'selectField'
-                                }}
+                          <TableCell>
+                            <CustomInput
+                              labelText="Order"
+                              id="newFieldOrder"
+                              name="newFieldOrder"
+                              formControlProps={{
+                                fullWidth: true
+                              }}
+                              inputProps={{
+                                onChange: (event) => handleChangeNewFieldOrder(event),
+                                value: newFieldOrder,                
+                              }}                           
+                            />
+                          </TableCell>
+                          <TableCell className={tableCellClasses} colSpan={2}>
+                          <FormControl
+                            fullWidth
+                            className={classes.selectFormControl}
                             >
-                                <MenuItem
-                                disabled
-                                classes={{
-                                    root: classes.selectMenuItem
-                                }}
-                                >
-                                Select Field
-                                </MenuItem>    
-                                {
-                                allFields.map(field => (
-                                    <MenuItem
-                                        key={field.id}
-                                        classes={{
-                                            root: classes.selectMenuItem,
-                                            selected: classes.selectMenuItemSelected
-                                        }}
-                                        value={field.id}
-                                    >
-                                    {field.name}
-                                    </MenuItem> 
-                                ))
-                                }                                                
+                            <InputLabel
+                                htmlFor={"Select an Existing Field"}
+                                className={classes.selectLabel}
+                            >
+                                Select an Existing Field
+                            </InputLabel>
+                            
+                            
+                            <Select
+                              MenuProps={{
+                              className: classes.selectMenu
+                              }}
+                              classes={{
+                              select: classes.select
+                              }}
+                              value={fieldSelect}
+                              onChange={handleFieldSelect}
+                              inputProps={{
+                                  name: 'selectField',
+                                  id: 'selectField'
+                              }}>
+                              <MenuItem
+                                  key=''
+                                  classes={{
+                                      root: classes.selectMenuItem,
+                                      selected: classes.selectMenuItemSelected
+                                  }}
+                                  value=''
+                              >Select an Existing Field
+                              </MenuItem>    
+                              {
+                              allFields.map(field => (
+                                  <MenuItem
+                                      key={field.id}
+                                      classes={{
+                                          root: classes.selectMenuItem,
+                                          selected: classes.selectMenuItemSelected
+                                      }}
+                                      value={field.id}
+                                  >
+                                  {field.name}
+                                  </MenuItem> 
+                              ))
+                              }                                                
                             </Select>
+                            </FormControl>
                           </TableCell>                        
                         </TableRow>
                       </TableBody>

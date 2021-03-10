@@ -77,6 +77,7 @@ export default function FieldDetail() {
   const [options, setOptions] = useState([])
   const [order, setOrder] = useState(history.location.state.order)  
   const [isDirty, setIsDirty] = useState(false)
+  const [isDeleted, setIsDeleted] = useState(false)
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -183,7 +184,6 @@ export default function FieldDetail() {
   }  
 
   async function handleDeleteField() {
-    // console.log('delete - field', field)
     // console.log('delete - form join id', field.Form.items[0].id)     
     var result = confirm("Are you sure you want to delete this field?");
     if (result) {                
@@ -191,12 +191,13 @@ export default function FieldDetail() {
 
       //delete if not on any other forms
       const apiData = await API.graphql(graphqlOperation(listFieldFormJoins, {
-        filter: {FieldID: {eq: fieldId}},
+        filter: {FieldID: {eq: fieldId}, id: {ne: fieldJoinId}},
       }))
-      if (apiData.data.listSubformFormJoins.items.length === 0) {
-        await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }}) 
-      }  
-      goToForm()            
+      //console.log('handleDeleteField : apiData', apiData)
+      if (apiData.data.listFieldFormJoins.items.length === 0) {
+        await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})                         
+      } 
+      setIsDeleted(true)         
     }        
   }
 
@@ -247,7 +248,21 @@ export default function FieldDetail() {
   )
   
   return (
-    <>
+    isDeleted ? (
+      <Card>
+      <CardHeader color="info" stats icon>
+      <CardIcon color="info">
+        <Icon>info_outline</Icon>
+      </CardIcon>
+      <h5 className={classes.cardTitle}>This field has been removed from the form.</h5>
+      <p className={classes.cardTitle}>If it was not linked to any other forms it has been deleted completely.</p>
+    </CardHeader>
+      <CardFooter>
+        <Button onClick={goToForm}>Done</Button>        
+      </CardFooter>
+    </Card>
+    ) : (      
+      <>
     <Card>
       <CardHeader color="info" stats icon>
         <CardIcon color="info">
@@ -654,7 +669,7 @@ export default function FieldDetail() {
         {saveButton}     
         {fieldId !== '' && (
         <Button
-          onClick={() => handleDeleteField()}
+          onClick={handleDeleteField}
           justIcon
           color="danger"
           className={classes.marginRight}
@@ -688,5 +703,6 @@ export default function FieldDetail() {
       </CardBody>      
       </Card>
       </>
+    )
   )
 }

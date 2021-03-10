@@ -4,8 +4,7 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { getForm } from '../../graphql/customQueries';
-import { fieldsByForm } from '../../graphql/queries';
+import { getForm, fieldsByForm, formsByForm, listSubformFormJoins } from '../../graphql/queries';
 import { updateForm as updateFormMutation } from '../../graphql/mutations';
 
 // @material-ui/core components
@@ -65,66 +64,72 @@ export default function FormTemplate() {
  
     const formId = history.location.state.formId
     const [form, setForm] = useState(initialFormState)
+    //const [order, setOrder] = useState(0)
+    const [parentFormId, setParentFormId] = useState('')
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
     const [incompleteSubforms, setIncompleteSubforms] = useState([])
     const [siblingForms, setSiblingForms] = useState([])
+    const [loading, setLoading] = useState(true)
     
 
     useEffect(() => {
       fetchForm()
-      fetchFields()
+      fetchFamilyForms()
       fetchSubforms()
+      fetchFields()      
     }, [formId]);
 
-    useEffect(() => {
-      fetchSiblingForms()
-    }, [form]);
+    // useEffect(() => {
+    //   fetchSiblingForms()
+    // }, [parentFormId]);
   
     async function fetchForm() {
       const formFromAPI = await API.graphql({ query: getForm, variables: { id: formId  }});    
-      //console.log('fetchForm : formFromAPI', formFromAPI)          
-      //console.log('fetchForm : formFromAPI.data.getForm', formFromAPI.data.getForm)          
-      //console.log('fetchForm : formFromAPI.data.getForm.Subform.items', formFromAPI.data.getForm.Subform.items)     
-      //console.log('fetchForm : formFromAPI.data.getForm.Field.items', formFromAPI.data.getForm.Field.items)     
-      setForm(formFromAPI.data.getForm)            
-      //setSubforms(formFromAPI.data.getForm.Subform.items)  
-      //setFields(formFromAPI.data.getForm.Field.items)
+      //console.log('fetchForm : formFromAPI', formFromAPI)              
+      setForm(formFromAPI.data.getForm)    
+    }
+
+    async function fetchFamilyForms() {
+      //get the details for the parent form and go to that form
+      const apiData = await API.graphql(graphqlOperation(listSubformFormJoins, {
+        filter: { SubformID: { eq: formId }},
+      }));        
+      const parentFormsFromAPI = apiData.data.listSubformFormJoins.items
+      //console.log('fetchParentForm: parentFormsFromAPI', parentFormsFromAPI)
+      if (parentFormsFromAPI.length > 0) {
+        setParentFormId(parentFormsFromAPI[0].FormID)    
+
+        const formsFromAPI = await API.graphql({ 
+          query: formsByForm, 
+          variables: { 
+            FormID: parentFormsFromAPI[0].FormID, 
+            order: {gt: parentFormsFromAPI[0].order},
+            filter: {SubformID: {ne: formId}},
+          },
+        }); 
+        //console.log('fetchParentForm : formsFromAPI.data.formsByForm.items', formsFromAPI.data.formsByForm.items)
+        setSiblingForms(formsFromAPI.data.formsByForm.items) 
+      } 
     }
 
     async function fetchFields() {
       const fieldsFromAPI = await API.graphql({ 
         query: fieldsByForm, 
-        variables: { parentFormId: formId },
+        variables: { FormID: formId },
       }); 
-      //console.log('fetchFields: fieldsFromAPI', fieldsFromAPI)                     
-      setFields(fieldsFromAPI.data.byFormId.items)  
+      //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+      setFields(fieldsFromAPI.data.fieldsByForm.items)  
     } 
 
     async function fetchSubforms() {
-      //console.log('fetchSubforms : formId', formId)
-      // const formsFromAPI = await API.graphql({ 
-      //   query: byParentFormId, 
-      //   variables: { parentFormId: formId },
-      // }); 
-      // console.log('fetchSubforms : formsFromAPI', formsFromAPI)
-      // setSubforms(formsFromAPI.data.byParentFormId.items)
-      // setIncompleteSubforms(formsFromAPI.data.byParentFormId.items.filter(form => !form.isComplete ))  
+      const formsFromAPI = await API.graphql({ 
+        query: formsByForm, 
+        variables: { FormID: formId },
+      });       
+      setSubforms(formsFromAPI.data.formsByForm.items)        
+      setIncompleteSubforms(formsFromAPI.data.formsByForm.items.filter(form => !form.Subform.isComplete ))
     } 
-
-    async function fetchSiblingForms() {
-      // if (form.parentFormId !== '-1')
-      //   {
-      //     const formsFromAPI = await API.graphql({ 
-      //       query: byParentFormId, 
-      //       variables: { parentFormId: form.parentFormId },
-      //     }); 
-
-      //     const incompleteSiblingForms = formsFromAPI.data.byParentFormId.items.filter(form => form.id != formId && !form.isComplete )
-      //     //console.log('incompleteSiblingForms', incompleteSiblingForms)
-      //     setSiblingForms(incompleteSiblingForms)       
-      // }
-    }
 
     async function handlePublishForm() {      
       await API.graphql({ 
@@ -180,22 +185,22 @@ export default function FormTemplate() {
     }
 
     function handleNextClick() {  
-      //console.log('handleNextClick: subforms', subforms)   
+      //console.log('handleNextClick: incompleteSubforms', incompleteSubforms)   
       //console.log('handleNextClick: siblingForms', siblingForms)   
-      //console.log('handleNextClick: parentFormId', form.parentFormId)   
+      //console.log('handleNextClick: parentFormId', parentFormId)   
 
       let nextFormId = form.parentFormId
-
       if (incompleteSubforms.length > 0) {
         //go to the next incomplete subform of this form, if there is one
-        nextFormId = incompleteSubforms[0].id    
-      } else if (siblingForms.length > 0 && form.parentFormId !== '-1') {
+        nextFormId = incompleteSubforms[0].Subform.id    
+        console.log('handleNextClick : incomplete subs : nextFormId:', nextFormId)     
+      } else if (siblingForms.length > 0) {
         //go to the next incomplete sibling form
-        nextFormId =  siblingForms[0].id    
+        nextFormId =  siblingForms[0].Subform.id    
+        console.log('handleNextClick : incomplete siblings : nextFormId:', nextFormId)     
       }
-
-      //console.log('handleNextClick: nextFormId:', nextFormId)     
-      if (nextFormId === '-1') {
+      
+      if (nextFormId === '') {
         history.push("/admin/sevenaforms")
       } else {
         history.push("/admin/formtemplate", { formId: nextFormId })
@@ -203,10 +208,10 @@ export default function FormTemplate() {
     }
 
     function handleBackClick() {    
-      if (form.parentFormId === '-1') {
+      if (parentFormId === '') {
         history.push("/admin/sevenaforms")
       } else {
-        history.push("/admin/formtemplate", { formId: form.parentFormId })
+        history.push("/admin/formtemplate", { formId: parentFormId })
       }
     }     
 
@@ -230,13 +235,14 @@ export default function FormTemplate() {
                       <Card>
                         <CardHeader color="primary">
                           <h4 className={classes.cardTitleWhite}>{form.name}</h4>
-                          <p className={classes.cardCategoryWhite}>{formId}</p>
+                          <p className={classes.cardCategoryWhite}>Form ID: {formId}</p>
+                          <p className={classes.cardCategoryWhite}>Parent Form ID: {parentFormId}</p>
                         </CardHeader>
                         <CardBody>
                           <GridContainer>
                           {
                               fields.map(field => (
-                                <SevenAField key={field.id} field={field} />
+                                <SevenAField key={field.Field.id} field={field.Field} />
                               ))
                             }                   
                           </GridContainer>        
@@ -265,13 +271,13 @@ export default function FormTemplate() {
                           <TableBody>
                           {
                             subforms.map(subform => (
-                              <TableRow className={classes.tableRow} key={subform.id}>
+                              <TableRow className={classes.tableRow} key={subform.Subform.id}>
                               <TableCell className={tableCellClasses}>
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={subform.isComplete}
-                                    onClick={ () => handleUnPublishForm(subform) }
+                                    checked={subform.Subform.isComplete}
+                                    onClick={ () => handleUnPublishForm(subform.Subform) }
                                     checkedIcon={
                                       <Check className={classes.checkedIcon} />
                                     }
@@ -289,8 +295,8 @@ export default function FormTemplate() {
                                 label="Complete"
                               />
                                 </TableCell>
-                                <TableCell className={tableCellClasses}>{subform.name}</TableCell>
-                                <TableCell className={tableCellClasses}>{subform.id}</TableCell>
+                                <TableCell className={tableCellClasses}>{subform.Subform.name}</TableCell>
+                                <TableCell className={tableCellClasses}>{subform.Subform.id}</TableCell>
                             </TableRow>
                             ))
                           }

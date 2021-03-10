@@ -47,7 +47,7 @@ type Field  @model
 type FieldFormJoin @model
 @key(name: "byForm", fields: ["FormID", "FieldID"])
 @key(name: "byField", fields: ["FieldID", "FormID"])
-@key(name:"fieldsByForm", fields:["FormID", "order"], queryField: "fieldsByForm")
+@key(name: "fieldsByForm", fields:["FormID", "order"], queryField: "fieldsByForm")
 {
   id: ID!
   FormID: ID!
@@ -60,7 +60,7 @@ type FieldFormJoin @model
 type SubformFormJoin @model
 @key(name: "byForm", fields: ["FormID", "SubformID"])
 @key(name: "bySubform", fields: ["SubformID", "FormID"])
-@key(name:"formsByForm", fields:["FormID", "order"], queryField: "formsByForm")
+@key(name: "formsByForm", fields:["FormID", "order"], queryField: "formsByForm")
 {
   id: ID!
   FormID: ID!

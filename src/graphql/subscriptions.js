@@ -6,7 +6,6 @@ export const onCreateForm = /* GraphQL */ `
     onCreateForm {
       id
       name
-      order
       code
       ref
       image
@@ -22,7 +21,6 @@ export const onCreateForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
-      parentFormId
       businessIntelligence
       Field {
         items {
@@ -56,7 +54,6 @@ export const onUpdateForm = /* GraphQL */ `
     onUpdateForm {
       id
       name
-      order
       code
       ref
       image
@@ -72,7 +69,6 @@ export const onUpdateForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
-      parentFormId
       businessIntelligence
       Field {
         items {
@@ -106,7 +102,6 @@ export const onDeleteForm = /* GraphQL */ `
     onDeleteForm {
       id
       name
-      order
       code
       ref
       image
@@ -122,7 +117,6 @@ export const onDeleteForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
-      parentFormId
       businessIntelligence
       Field {
         items {
@@ -156,7 +150,6 @@ export const onCreateField = /* GraphQL */ `
     onCreateField {
       id
       name
-      order
       code
       ref
       description
@@ -171,7 +164,6 @@ export const onCreateField = /* GraphQL */ `
       image
       dox
       size
-      parentFormId
       businessIntelligence
       Form {
         items {
@@ -194,7 +186,6 @@ export const onUpdateField = /* GraphQL */ `
     onUpdateField {
       id
       name
-      order
       code
       ref
       description
@@ -209,7 +200,6 @@ export const onUpdateField = /* GraphQL */ `
       image
       dox
       size
-      parentFormId
       businessIntelligence
       Form {
         items {
@@ -232,7 +222,6 @@ export const onDeleteField = /* GraphQL */ `
     onDeleteField {
       id
       name
-      order
       code
       ref
       description
@@ -247,7 +236,6 @@ export const onDeleteField = /* GraphQL */ `
       image
       dox
       size
-      parentFormId
       businessIntelligence
       Form {
         items {
@@ -275,7 +263,6 @@ export const onCreateFieldFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -291,7 +278,6 @@ export const onCreateFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -305,7 +291,6 @@ export const onCreateFieldFormJoin = /* GraphQL */ `
       Field {
         id
         name
-        order
         code
         ref
         description
@@ -320,7 +305,6 @@ export const onCreateFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
-        parentFormId
         businessIntelligence
         Form {
           nextToken
@@ -343,7 +327,6 @@ export const onUpdateFieldFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -359,7 +342,6 @@ export const onUpdateFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -373,7 +355,6 @@ export const onUpdateFieldFormJoin = /* GraphQL */ `
       Field {
         id
         name
-        order
         code
         ref
         description
@@ -388,7 +369,6 @@ export const onUpdateFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
-        parentFormId
         businessIntelligence
         Form {
           nextToken
@@ -411,7 +391,6 @@ export const onDeleteFieldFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -427,7 +406,6 @@ export const onDeleteFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -441,7 +419,6 @@ export const onDeleteFieldFormJoin = /* GraphQL */ `
       Field {
         id
         name
-        order
         code
         ref
         description
@@ -456,7 +433,6 @@ export const onDeleteFieldFormJoin = /* GraphQL */ `
         image
         dox
         size
-        parentFormId
         businessIntelligence
         Form {
           nextToken
@@ -479,7 +455,6 @@ export const onCreateSubformFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -495,7 +470,6 @@ export const onCreateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -509,7 +483,6 @@ export const onCreateSubformFormJoin = /* GraphQL */ `
       Subform {
         id
         name
-        order
         code
         ref
         image
@@ -525,7 +498,6 @@ export const onCreateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -551,7 +523,6 @@ export const onUpdateSubformFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -567,7 +538,6 @@ export const onUpdateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -581,7 +551,6 @@ export const onUpdateSubformFormJoin = /* GraphQL */ `
       Subform {
         id
         name
-        order
         code
         ref
         image
@@ -597,7 +566,6 @@ export const onUpdateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -623,7 +591,6 @@ export const onDeleteSubformFormJoin = /* GraphQL */ `
       Form {
         id
         name
-        order
         code
         ref
         image
@@ -639,7 +606,6 @@ export const onDeleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken
@@ -653,7 +619,6 @@ export const onDeleteSubformFormJoin = /* GraphQL */ `
       Subform {
         id
         name
-        order
         code
         ref
         image
@@ -669,7 +634,6 @@ export const onDeleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
-        parentFormId
         businessIntelligence
         Field {
           nextToken

@@ -7,7 +7,7 @@ import TagsInput from "react-tagsinput";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { getField } from '../../graphql/queries';
+import { getField, listFieldFormJoins } from '../../graphql/queries';
 import { 
   createField as createFieldMutation, 
   createFieldFormJoin as createFieldFormJoinMutation, 
@@ -188,7 +188,14 @@ export default function FieldDetail() {
     var result = confirm("Are you sure you want to delete this field?");
     if (result) {                
       await API.graphql({ query: deleteFieldFormJoinMutation, variables: { input: { id: fieldJoinId } }})
-      await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }})   
+
+      //delete if not on any other forms
+      const apiData = await API.graphql(graphqlOperation(listFieldFormJoins, {
+        filter: {FieldID: {eq: fieldId}},
+      }))
+      if (apiData.data.listSubformFormJoins.items.length === 0) {
+        await API.graphql({ query: deleteFieldMutation, variables: { input: { id: fieldId } }}) 
+      }  
       goToForm()            
     }        
   }

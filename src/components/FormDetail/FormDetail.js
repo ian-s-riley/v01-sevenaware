@@ -5,7 +5,7 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { getForm, listSubformFormJoins, fieldsByForm, formsByForm } from '../../graphql/queries';
+import { getForm, listSubformFormJoins, fieldsByForm, formsByForm, listFields } from '../../graphql/queries';
 import { 
   createForm as createFormMutation, 
   createSubformFormJoin as createSubformFormJoinMutation,
@@ -13,6 +13,7 @@ import {
   deleteSubformFormJoin as deleteSubformFormJoinMutation,
   updateForm as updateFormMutation,
   updateSubformFormJoin as updateSubformFormJoinMutation,
+  createFieldFormJoin as createFieldFormJoinMutation,
 } from '../../graphql/mutations';
 
 //import { onCreateField, onUpdateField } from "../../graphql/subscriptions";
@@ -40,6 +41,8 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import styles from "assets/jss/material-dashboard-pro-react/views/extendedFormsStyle.js";
 const useStyles = makeStyles(styles);
@@ -75,8 +78,10 @@ export default function FormDetail() {
   const [form, setForm] = useState(initialFormState)
   const [subforms, setSubforms] = useState([])
   const [fields, setFields] = useState([])  
+  const [allFields, setAllFields] = useState([])  
   const [order, setOrder] = useState(10)  
   const [isDirty, setIsDirty] = useState(false)
+  const [fieldSelect, setFieldSelect] = useState("");
 
   useEffect(() => {
     // Specify how to clean up after this effect:
@@ -140,8 +145,15 @@ export default function FormDetail() {
       query: fieldsByForm, 
       variables: { FormID: formId },
     }); 
-    console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+    //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
     setFields(fieldsFromAPI.data.fieldsByForm.items)  
+
+
+    const allFieldsFromAPI = await API.graphql({ 
+      query: listFields, 
+    }); 
+    console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
+    setAllFields(allFieldsFromAPI.data.listFields.items)
   } 
 
   // function subscribeCreateField() {
@@ -181,6 +193,7 @@ export default function FormDetail() {
     if (!form.name || !form.code) return    
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const newFormId = apiData.data.createForm.id
+    console.log('createForm: newFormId', newFormId)
 
     //if not a top level form, add the subform to form join
     if (parentFormId !== '') {      
@@ -191,7 +204,7 @@ export default function FormDetail() {
           order: order
         }
       }))       
-      //console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
+      console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
       setParentFormJoinId(newFormJoinFromAPI.data.createSubformFormJoin.id)
     }    
     setIsDirty(false)
@@ -312,18 +325,18 @@ export default function FormDetail() {
     setFormId('')
   } 
 
-  async function handleSelectSubform(subformId, nextParentFormJoinId, nextOrder) { 
+  function handleSelectSubform(subformId, nextParentFormJoinId, nextOrder) { 
     //console.log('handleSelectSubform: subformId', subformId)
     //console.log('handleSelectSubform: nextParentFormId', nextParentFormId)
     //console.log('handleSelectSubform: nextParentFormJoinId', nextParentFormJoinId)
-    console.log('handleSelectSubform: nextOrder', nextOrder)
+    //console.log('handleSelectSubform: nextOrder', nextOrder)
     setOrder(nextOrder)
     setParentFormJoinId(nextParentFormJoinId)    
     setParentFormId(formId)
     setFormId(subformId)
   }    
 
-  async function handleSelectField(field) { 
+  function handleSelectField(field) { 
     //console.log('handleSelectField: field', field)
     history.push("/admin/fielddetail", { fieldId: field.FieldID, fieldJoinId: field.id, order: field.order, formId: formId, parentFormId: parentFormId, parentFormJoinId: parentFormJoinId }) 
   }  
@@ -331,6 +344,23 @@ export default function FormDetail() {
   function handleCreateField() {
     history.push("/admin/fielddetail", { fieldId: '', formId: formId, formJoinId: '', order: 10, parentFormId: parentFormId, parentFormJoinId: parentFormJoinId }) 
   }    
+
+  const handleFieldSelect = event => {
+      setFieldSelect(event.target.value);
+  }
+
+  async function handleSelectExistingField() { 
+    console.log('handleSelectExistingField: field', fieldSelect)
+    const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+      input:{
+        FormID: formId, 
+        FieldID: fieldSelect,
+        order: 10,
+      }
+    }))
+    console.log('handleSelectExistingField: fieldJoinFromAPI', fieldJoinFromAPI)
+    //setFields(...fields, fieldJoinFromAPI.data.fieldSelect)
+  } 
 
   const saveButton = (
     isDirty ? (
@@ -711,6 +741,56 @@ export default function FormDetail() {
                         </TableRow>
                         ))
                       }
+                      <TableRow>                          
+                        <TableCell className={tableCellClasses}>
+                          <Button
+                            onClick={handleSelectExistingField}
+                            justIcon
+                            color="rose"
+                            >
+                            <Add className={classes.icons} />
+                          </Button>
+                          </TableCell>
+                          <TableCell className={tableCellClasses} colSpan={3}>
+                            <Select
+                                MenuProps={{
+                                className: classes.selectMenu
+                                }}
+                                classes={{
+                                select: classes.select
+                                }}
+                                value={fieldSelect}
+                                onChange={handleFieldSelect}
+                                inputProps={{
+                                    name: 'selectField',
+                                    id: 'selectField'
+                                }}
+                            >
+                                <MenuItem
+                                disabled
+                                classes={{
+                                    root: classes.selectMenuItem
+                                }}
+                                >
+                                Select Field
+                                </MenuItem>    
+                                {
+                                allFields.map(field => (
+                                    <MenuItem
+                                        key={field.id}
+                                        classes={{
+                                            root: classes.selectMenuItem,
+                                            selected: classes.selectMenuItemSelected
+                                        }}
+                                        value={field.id}
+                                    >
+                                    {field.name}
+                                    </MenuItem> 
+                                ))
+                                }                                                
+                            </Select>
+                          </TableCell>                        
+                        </TableRow>
                       </TableBody>
                     </Table>                      
                     </CardBody>

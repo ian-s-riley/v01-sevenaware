@@ -5,7 +5,7 @@ import classnames from "classnames";
 
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
-import { getForm, listSubformFormJoins, fieldsByForm, formsByForm, listFields } from '../../graphql/queries';
+import { getForm, listSubformFormJoins, fieldsByForm, formsByForm, fieldsByLenderId } from '../../graphql/queries';
 import { 
   createForm as createFormMutation, 
   createSubformFormJoin as createSubformFormJoinMutation,
@@ -154,10 +154,11 @@ export default function FormDetail() {
 
 
     const allFieldsFromAPI = await API.graphql({ 
-      query: listFields, 
+      query: fieldsByLenderId, 
+      variables: { lenderId: "-1" },
     }); 
     //console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
-    setAllFields(allFieldsFromAPI.data.listFields.items)
+    setAllFields(allFieldsFromAPI.data.fieldsByLenderId.items)
   } 
 
   // function subscribeCreateField() {

@@ -23,6 +23,7 @@ type Form @model
  }
 
 type Field  @model
+@key(name: "fieldsByLenderId", fields:["lenderId", "name"], queryField: "fieldsByLenderId")
 {
   id: ID!
 	name: String!
@@ -34,7 +35,7 @@ type Field  @model
 	defaultValue: String
 	options: String
 	userId: String
-	lenderId: String
+	lenderId: String!
 	label: String
 	helpText: String 
   image: String

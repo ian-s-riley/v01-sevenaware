@@ -420,6 +420,51 @@ export const listSubformFormJoins = /* GraphQL */ `
     }
   }
 `;
+export const fieldsByLenderId = /* GraphQL */ `
+  query FieldsByLenderId(
+    $lenderId: String
+    $name: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFieldFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    fieldsByLenderId(
+      lenderId: $lenderId
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        code
+        ref
+        description
+        fieldType
+        value
+        defaultValue
+        options
+        userId
+        lenderId
+        label
+        helpText
+        image
+        dox
+        size
+        businessIntelligence
+        Form {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
 export const fieldsByForm = /* GraphQL */ `
   query FieldsByForm(
     $FormID: ID

@@ -52,7 +52,7 @@ const initialFieldState = {
     defaultValue: '',
     options: '',
     userId: '',
-    lenderId: '',
+    lenderId: '-1',
     label: '',
     helpText: '',
     image: '',

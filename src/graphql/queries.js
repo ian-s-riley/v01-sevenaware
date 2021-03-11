@@ -21,7 +21,10 @@ export const getForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
+      isArray
       businessIntelligence
+      userId
+      lenderId
       Field {
         items {
           id
@@ -74,7 +77,10 @@ export const listForms = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -184,7 +190,10 @@ export const getFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -253,7 +262,10 @@ export const listFieldFormJoins = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }
@@ -310,7 +322,10 @@ export const getSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -338,7 +353,10 @@ export const getSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -387,7 +405,10 @@ export const listSubformFormJoins = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }
@@ -409,7 +430,10 @@ export const listSubformFormJoins = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }
@@ -505,7 +529,10 @@ export const fieldsByForm = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }
@@ -577,7 +604,10 @@ export const formsByForm = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }
@@ -599,7 +629,10 @@ export const formsByForm = /* GraphQL */ `
           dox
           isComplete
           isTopLevel
+          isArray
           businessIntelligence
+          userId
+          lenderId
           createdAt
           updatedAt
         }

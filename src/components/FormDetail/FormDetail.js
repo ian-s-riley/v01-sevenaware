@@ -67,7 +67,10 @@ const initialFormState = {
   dox: '',
 	isComplete: false,
   isTopLevel: true,
+  isArray: false,
   businessIntelligence: '',  
+  userId: '',
+  lenderId: '-1',
 }
 
 export default function FormDetail() {
@@ -383,7 +386,7 @@ export default function FormDetail() {
     //console.log('handleAddExistingField: field', fieldSelect)
     if (fieldSelect !== '') {
       //make sure this fields hasn't already been added 
-      
+
 
 
       const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{

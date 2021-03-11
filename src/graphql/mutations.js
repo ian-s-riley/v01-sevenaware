@@ -24,7 +24,10 @@ export const createForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
+      isArray
       businessIntelligence
+      userId
+      lenderId
       Field {
         items {
           id
@@ -75,7 +78,10 @@ export const updateForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
+      isArray
       businessIntelligence
+      userId
+      lenderId
       Field {
         items {
           id
@@ -126,7 +132,10 @@ export const deleteForm = /* GraphQL */ `
       dox
       isComplete
       isTopLevel
+      isArray
       businessIntelligence
+      userId
+      lenderId
       Field {
         items {
           id
@@ -299,7 +308,10 @@ export const createFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -366,7 +378,10 @@ export const updateFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -433,7 +448,10 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -500,7 +518,10 @@ export const createSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -528,7 +549,10 @@ export const createSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -571,7 +595,10 @@ export const updateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -599,7 +626,10 @@ export const updateSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -642,7 +672,10 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }
@@ -670,7 +703,10 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         dox
         isComplete
         isTopLevel
+        isArray
         businessIntelligence
+        userId
+        lenderId
         Field {
           nextToken
         }

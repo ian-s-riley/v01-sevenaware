@@ -113,7 +113,7 @@ export default function FormDetail() {
   // }, [])
 
   async function fetchForm() {
-      console.log('fetchForm: formId', formId)
+      //console.log('fetchForm: formId', formId)
       //console.log('fetchForm: parentFormId', parentFormId)
       if (formId === '') {
           //new form, get the parent form we will use
@@ -157,9 +157,26 @@ export default function FormDetail() {
       query: fieldsByLenderId, 
       variables: { lenderId: "-1" },
     }); 
-    //console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
     setAllFields(allFieldsFromAPI.data.fieldsByLenderId.items)
+    // console.log('fetchFields: allFieldsFromAPI', allFieldsFromAPI) 
+    // if (fieldsFromAPI.data.fieldsByForm.items.length > 0) {
+    //   setAllFields(filterByReference(allFieldsFromAPI.data.fieldsByLenderId.items, fieldsFromAPI.data.fieldsByForm.items))  
+    // } else {
+    //   setAllFields(allFieldsFromAPI.data.fieldsByLenderId.items)
+    // }    
   } 
+
+  const filterByReference = (arr1, arr2) => {
+    let res = [];
+    res = arr1.filter(el => {
+       return !arr2.find(element => {
+          return element.id === el.id;
+       });
+    });
+    return res;
+ }
+
+
 
   // function subscribeCreateField() {
   //   const subscription = API.graphql(graphqlOperation(onCreateField))
@@ -365,6 +382,10 @@ export default function FormDetail() {
   async function handleAddExistingField() { 
     //console.log('handleAddExistingField: field', fieldSelect)
     if (fieldSelect !== '') {
+      //make sure this fields hasn't already been added 
+      
+
+
       const fieldJoinFromAPI = await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
         input:{
           FormID: formId, 

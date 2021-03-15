@@ -9,17 +9,10 @@
             "authenticationType": "API_KEY",
             "apiKeyConfig": {
               "apiKeyExpirationDays": 365,
-              "description": "v01sevenaware-key"
+              "description": "v01-sevenaware-key"
             }
           },
-          "additionalAuthenticationProviders": [
-            {
-              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-              "userPoolConfig": {
-                "userPoolId": "authv01sevenaware84249243"
-              }
-            }
-          ]
+          "additionalAuthenticationProviders": []
         }
       }
     }

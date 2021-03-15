@@ -46,6 +46,7 @@ import HelpOutline from "@material-ui/icons/HelpOutline";
 import Dashboard from "@material-ui/icons/Dashboard";
 import Add from "@material-ui/icons/AddCircle";
 import Cancel from "@material-ui/icons/Cancel";
+import { TheatersRounded } from '@material-ui/icons';
 
 const styles = {
   cardCategoryWhite: {
@@ -82,7 +83,11 @@ export default function FormTemplate() {
     const [incompleteSubforms, setIncompleteSubforms] = useState([])
     const [siblingForms, setSiblingForms] = useState([])
     const [arrayForms, setArrayForms] = useState([])
-    const [loading, setLoading] = useState(true)
+
+    const [showArrayForm, setShowArrayForm] = useState(false)
+    const [index, setIndex] = useState("")
+
+
 
     
 
@@ -350,7 +355,13 @@ export default function FormTemplate() {
       setArrayForms(arrayForms.filter(arrayForm => arrayForm.id !== arrayFormJoinId))      
     }    
 
+    function handleShowArrayForm(index) {    
+      setIndex(index)  
+      setShowArrayForm(!showArrayForm)
+    }
+
   return (
+    !showArrayForm ? (
     <div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
@@ -391,6 +402,7 @@ export default function FormTemplate() {
                                   <TableCell className={tableCellClasses}></TableCell>
                                   <TableCell className={tableCellClasses}>
                                       <Button
+                                        onClick={() => handleShowArrayForm(1)}
                                         justIcon
                                         color="success"
                                         className={classes.marginRight}
@@ -423,6 +435,7 @@ export default function FormTemplate() {
                                   </TableCell>
                                   <TableCell className={tableCellClasses}>
                                       <Button
+                                        onClick={() => handleShowArrayForm(index+2)}
                                         justIcon
                                         color="success"
                                         className={classes.marginRight}
@@ -434,7 +447,7 @@ export default function FormTemplate() {
                                 ))}
                                 
                                 <TableRow>                          
-                                  <TableCell className={tableCellClasses} colSpan={2}>Add another...</TableCell> 
+                                  <TableCell className={tableCellClasses} colSpan={3}>Add another...</TableCell> 
                                   <TableCell className={tableCellClasses}>
                                     <Button
                                       onClick={createArrayForm}
@@ -551,12 +564,83 @@ export default function FormTemplate() {
             </CardBody>
           </Card>
         </GridItem>
-      </GridContainer>
+      </GridContainer>       
+    </div>
+    ) : (
+<div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
-          
+          <Card>
+            <CardBody>
+              <NavPills
+                color="rose"
+                horizontal={{
+                  tabsGrid: { xs: 12, sm: 12, md: 2 },
+                  contentGrid: { xs: 12, sm: 12, md: 10 }
+                }}
+                tabs={[
+                  {
+                    tabButton: "Array Form",
+                    tabIcon: Dashboard,
+                    tabContent: (
+                      <>
+                      <Card>
+                        <CardHeader color="warning">
+                          <h4 className={classes.cardTitleWhite}>{form.name} ({index})</h4>
+                          <p className={classes.cardCategoryWhite}>{form.description}</p>
+                        </CardHeader>
+                        <CardBody>                          
+                            <GridContainer>
+                            {
+                              fields.map(field => (
+                                <SevenAField key={field.Field.id} field={field.Field} />
+                              ))
+                            }                   
+                            </GridContainer>                            
+                        </CardBody>
+                        <CardFooter>
+                          <Button color="info" onClick={() => handleShowArrayForm("")}>Back</Button>
+                          <Button color="success" onClick={() => handleShowArrayForm("")}>Save</Button>
+                        </CardFooter>
+                      </Card>
+                      </>
+                    )
+                  },                  
+                  {
+                    tabButton: "Help Center",
+                    tabIcon: HelpOutline,
+                    tabContent: (
+                      <Card>
+                        <CardHeader>
+                          <h4 className={classes.cardTitle}>{form.helpCategory}</h4>
+                          <p className={classes.cardCategory}>
+                            {form.helpTitle}
+                          </p>
+                        </CardHeader>
+                        <CardBody>
+                          {form.helpDescription}
+                        </CardBody>
+                      </Card>
+                    )
+                  },
+                  {
+                    tabButton: "Legal Info",
+                    tabIcon: Gavel,
+                    tabContent: (
+                      <Card>
+                        <CardBody>
+                          {form.legalDescription}
+                        </CardBody>
+                      </Card>
+                    )
+                  }
+                ]}
+              />
+            </CardBody>
+          </Card>
         </GridItem>
-      </GridContainer>        
+      </GridContainer>       
     </div>
-  );
+    )
+  )
 }

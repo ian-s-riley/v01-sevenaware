@@ -50,6 +50,17 @@ export const createForm = /* GraphQL */ `
         }
         nextToken
       }
+      ArrayForm {
+        items {
+          id
+          FormID
+          ArrayFormID
+          order
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -104,6 +115,17 @@ export const updateForm = /* GraphQL */ `
         }
         nextToken
       }
+      ArrayForm {
+        items {
+          id
+          FormID
+          ArrayFormID
+          order
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -152,6 +174,17 @@ export const deleteForm = /* GraphQL */ `
           id
           FormID
           SubformID
+          order
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      ArrayForm {
+        items {
+          id
+          FormID
+          ArrayFormID
           order
           createdAt
           updatedAt
@@ -318,6 +351,9 @@ export const createFieldFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -386,6 +422,9 @@ export const updateFieldFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -458,6 +497,9 @@ export const deleteFieldFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -528,6 +570,9 @@ export const createSubformFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -557,6 +602,9 @@ export const createSubformFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -605,6 +653,9 @@ export const updateSubformFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -634,6 +685,9 @@ export const updateSubformFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -682,6 +736,9 @@ export const deleteSubformFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -711,6 +768,258 @@ export const deleteSubformFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createArrayFormJoin = /* GraphQL */ `
+  mutation CreateArrayFormJoin(
+    $input: CreateArrayFormJoinInput!
+    $condition: ModelArrayFormJoinConditionInput
+  ) {
+    createArrayFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      ArrayFormID
+      order
+      Form {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      ArrayForm {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateArrayFormJoin = /* GraphQL */ `
+  mutation UpdateArrayFormJoin(
+    $input: UpdateArrayFormJoinInput!
+    $condition: ModelArrayFormJoinConditionInput
+  ) {
+    updateArrayFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      ArrayFormID
+      order
+      Form {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      ArrayForm {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteArrayFormJoin = /* GraphQL */ `
+  mutation DeleteArrayFormJoin(
+    $input: DeleteArrayFormJoinInput!
+    $condition: ModelArrayFormJoinConditionInput
+  ) {
+    deleteArrayFormJoin(input: $input, condition: $condition) {
+      id
+      FormID
+      ArrayFormID
+      order
+      Form {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      ArrayForm {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt

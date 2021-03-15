@@ -152,7 +152,7 @@ export default function FormDetail() {
       query: fieldsByForm, 
       variables: { FormID: formId },
     }); 
-    console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+    //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
     setFields(fieldsFromAPI.data.fieldsByForm.items)  
 
 
@@ -218,7 +218,7 @@ export default function FormDetail() {
     if (!form.name || !form.code) return    
     const apiData = await API.graphql({ query: createFormMutation, variables: { input: form } })
     const newFormId = apiData.data.createForm.id
-    console.log('createForm: newFormId', newFormId)
+    //console.log('createForm: newFormId', newFormId)
 
     //if not a top level form, add the subform to form join
     if (parentFormId !== '') {      
@@ -229,7 +229,7 @@ export default function FormDetail() {
           order: order
         }
       }))       
-      console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
+      //console.log('createForm: newFormFromAPI', newFormJoinFromAPI.data.createSubformFormJoin.id)
       setParentFormJoinId(newFormJoinFromAPI.data.createSubformFormJoin.id)
     }    
     setIsDirty(false)
@@ -258,6 +258,7 @@ export default function FormDetail() {
                         legalDescription: form.legalDescription,
                         dox: form.dox,
                         businessIntelligence: form.businessIntelligence,
+                        isArray: form.isArray,
                       }} 
                     });  
 
@@ -308,7 +309,7 @@ export default function FormDetail() {
   }
 
   async function goUp() {
-    console.log('goUp : parentFormId', parentFormId)
+    //console.log('goUp : parentFormId', parentFormId)
     //if a top level form go to forms list else go to parent form
     if (parentFormId === '') {
       history.replace("/admin/sevenaforms")
@@ -335,6 +336,18 @@ export default function FormDetail() {
       const {id, value} = e.currentTarget;
       setIsDirty(true)
       setForm({ ...form, [id]: value})      
+  }
+
+  function handleChangeCode(e) {
+    const {id, value} = e.currentTarget;
+    setIsDirty(true)
+    setForm({ ...form, [id]: value.replace(/\s+/g, '-').toLowerCase()})      
+  }
+
+  const handleChangeSelect = event => {
+    const {name, value} = event.target;
+    setIsDirty(true)
+    setForm({ ...form, [name]: value})
   }
 
   function handleChangeOrder(e) {
@@ -396,7 +409,7 @@ export default function FormDetail() {
           order: newFieldOrder,
         }
       }))
-      console.log('handleAddExistingField: fieldJoinFromAPI', fieldJoinFromAPI)
+      //console.log('handleAddExistingField: fieldJoinFromAPI', fieldJoinFromAPI)
       setNewFieldOrder(10)
       setFieldSelect('')
       setFields([...fields, fieldJoinFromAPI.data.createFieldFormJoin])
@@ -446,34 +459,6 @@ export default function FormDetail() {
       </CardHeader>
       <CardBody>
       <GridContainer>                            
-          <GridItem xs={12} sm={12} md={6}>
-            <CustomInput
-              labelText="Form Name"
-              id="name"
-              name="name"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: form.name,                
-              }}                           
-            />
-          </GridItem>          
-          <GridItem xs={12} sm={12} md={6}>
-          <CustomInput
-              labelText="Code"
-              id="code"
-              formControlProps={{
-                fullWidth: true
-              }}
-              inputProps={{
-                onChange: (event) => handleChange(event),
-                value: form.code,                
-              }}
-            />
-          </GridItem>
-          
           <GridItem xs={12} sm={12} md={2}>
             <CustomInput
               labelText="Order"
@@ -488,8 +473,82 @@ export default function FormDetail() {
               }}                           
             />
           </GridItem>
+          <GridItem xs={12} sm={12} md={5}>
+            <CustomInput
+              labelText="Form Name"
+              id="name"
+              name="name"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChange(event),
+                value: form.name,                
+              }}                           
+            />
+          </GridItem>          
+          <GridItem xs={12} sm={12} md={5}>
+          <CustomInput
+              labelText="Code"
+              id="code"
+              formControlProps={{
+                fullWidth: true
+              }}
+              inputProps={{
+                onChange: (event) => handleChangeCode(event),
+                value: form.code,                
+              }}
+            />
+          </GridItem>        
 
           <GridItem xs={12} sm={12} md={2}>
+          <FormControl
+              fullWidth
+              className={classes.selectFormControl}
+            >
+              <InputLabel
+                htmlFor="isArray"
+                className={classes.selectLabel}
+              >
+                [0, 1, or Many]
+              </InputLabel>
+              <Select
+                MenuProps={{
+                  className: classes.selectMenu
+                }}
+                classes={{
+                  select: classes.select
+                }}
+                value={form.isArray || false}
+                onChange={handleChangeSelect}
+                inputProps={{
+                  name: "isArray",
+                  id: "isArray"
+                }}
+              >
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value={false}
+                >
+                  No
+                </MenuItem>
+                <MenuItem
+                  classes={{
+                    root: classes.selectMenuItem,
+                    selected: classes.selectMenuItemSelected
+                  }}
+                  value={true}
+                >
+                  Yes
+                </MenuItem>                                                          
+              </Select>
+            </FormControl>
+          </GridItem>           
+
+          <GridItem xs={12} sm={12} md={5}>
             <CustomInput
               labelText="Ref (form id)"
               id="ref"
@@ -503,7 +562,7 @@ export default function FormDetail() {
               }}                           
             />
           </GridItem>
-          <GridItem xs={12} sm={12} md={8}>
+          <GridItem xs={12} sm={12} md={12}>
             <CustomInput
                 labelText="Description"
                 id="description"

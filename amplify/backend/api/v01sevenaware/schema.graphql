@@ -1,4 +1,5 @@
 type Form @model
+@key(name: "formsByLenderId", fields:["lenderId", "name"], queryField: "formsByLenderId")
 {
   id: ID!
   name: String!  
@@ -20,9 +21,10 @@ type Form @model
   isArray: Boolean
   businessIntelligence: String
   userId: String
-  lenderId: String
+  lenderId: String!
   Field:[FieldFormJoin]!@connection(keyName: "byForm", fields: ["id"])
   Subform:[SubformFormJoin]!@connection(keyName: "byForm", fields: ["id"])
+  ArrayForm:[ArrayFormJoin]!@connection(keyName: "byForm", fields: ["id"])
  }
 
 type Field  @model
@@ -57,8 +59,8 @@ type FieldFormJoin @model
   FormID: ID!
   FieldID: ID!
   order: Int
-  Form: Form!   @connection(fields: ["FormID"])      
-  Field: Field!  @connection(fields: ["FieldID"])
+  Form: Form! @connection(fields: ["FormID"])      
+  Field: Field! @connection(fields: ["FieldID"])
 }
 
 type SubformFormJoin @model
@@ -70,6 +72,18 @@ type SubformFormJoin @model
   FormID: ID!
   SubformID: ID!
   order: Int
-  Form: Form!   @connection(fields: ["FormID"])      
-  Subform: Form!  @connection(fields: ["SubformID"])
+  Form: Form! @connection(fields: ["FormID"])      
+  Subform: Form! @connection(fields: ["SubformID"])
+}
+
+type ArrayFormJoin @model
+@key(name: "byForm", fields: ["FormID", "ArrayFormID"])
+@key(name: "byArrayForm", fields: ["ArrayFormID", "FormID"])
+{
+  id: ID!
+  FormID: ID!
+  ArrayFormID: ID!
+  order: Int
+  Form: Form! @connection(fields: ["FormID"])      
+  ArrayForm: Form! @connection(fields: ["ArrayFormID"])
 }

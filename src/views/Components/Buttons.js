@@ -135,15 +135,7 @@ export default function Buttons() {
             <div className={classes.cardContentLeft}>
               <Pagination
                 pages={[
-                  { text: 1 },
-                  { text: "..." },
-                  { text: 5 },
-                  { text: 6 },
                   { active: true, text: 7 },
-                  { text: 8 },
-                  { text: 9 },
-                  { text: "..." },
-                  { text: 12 }
                 ]}
               />
               <Pagination

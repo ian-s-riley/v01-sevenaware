@@ -60,3 +60,49 @@ export const getForm = /* GraphQL */ `
     }
   }
 `;
+
+
+
+export const listArrayFormsAndFields = /* GraphQL */ `
+  query ListArrayFormJoins(
+    $filter: ModelArrayFormJoinFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listArrayFormJoins(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        ArrayFormID
+        id
+        order
+        FormID
+        ArrayForm {
+          Field {
+            items {
+              Field {
+                id
+                name
+                fieldType
+                defaultValue
+                description
+                helpText
+                dox
+                code
+                image
+                label
+                lenderId
+                options
+                ref
+                size
+                userId
+                value
+              }
+              order
+              id
+            }
+          }
+        }
+      }
+      nextToken
+    }
+  }
+`;

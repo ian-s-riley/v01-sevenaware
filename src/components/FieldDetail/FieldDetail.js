@@ -207,6 +207,14 @@ export default function FieldDetail() {
       setField({ ...field, [id]: value})      
   }
 
+  function handleChangeCode(e) {
+    const {id, value} = e.currentTarget;
+    setIsDirty(true)
+    setField({ ...field, [id]: value.replace(/\s+/g, '-').toLowerCase()})      
+  }
+
+  //str = str;
+
   function handleChangeOrder(e) {
     const {id, value} = e.currentTarget;
     setIsDirty(true)
@@ -269,10 +277,6 @@ export default function FieldDetail() {
           <Icon>info_outline</Icon>
         </CardIcon>
         <h5 className={classes.cardTitle}>Field ID: {fieldId}</h5>
-        <h5 className={classes.cardTitle}>Form ID: {formId}</h5>
-        <h5 className={classes.cardTitle}>Form Join ID: {fieldJoinId}</h5>
-        <h5 className={classes.cardTitle}>Parent Form ID: {parentFormId}</h5>
-        <h5 className={classes.cardTitle}>Parent Form Join ID: {parentFormJoinId}</h5>
       </CardHeader>
       <CardBody>
       
@@ -315,7 +319,7 @@ export default function FieldDetail() {
                   fullWidth: true
                 }}
                 inputProps={{
-                  onChange: (event) => handleChange(event),
+                  onChange: (event) => handleChangeCode(event),
                   value: field.code,                
                 }}
               />

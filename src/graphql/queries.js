@@ -47,6 +47,17 @@ export const getForm = /* GraphQL */ `
         }
         nextToken
       }
+      ArrayForm {
+        items {
+          id
+          FormID
+          ArrayFormID
+          order
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -85,6 +96,9 @@ export const listForms = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -198,6 +212,9 @@ export const getFieldFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -332,6 +349,9 @@ export const getSubformFormJoin = /* GraphQL */ `
         Subform {
           nextToken
         }
+        ArrayForm {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -361,6 +381,9 @@ export const getSubformFormJoin = /* GraphQL */ `
           nextToken
         }
         Subform {
+          nextToken
+        }
+        ArrayForm {
           nextToken
         }
         createdAt
@@ -436,6 +459,210 @@ export const listSubformFormJoins = /* GraphQL */ `
           lenderId
           createdAt
           updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getArrayFormJoin = /* GraphQL */ `
+  query GetArrayFormJoin($id: ID!) {
+    getArrayFormJoin(id: $id) {
+      id
+      FormID
+      ArrayFormID
+      order
+      Form {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      ArrayForm {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listArrayFormJoins = /* GraphQL */ `
+  query ListArrayFormJoins(
+    $filter: ModelArrayFormJoinFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listArrayFormJoins(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        FormID
+        ArrayFormID
+        order
+        Form {
+          id
+          name
+          code
+          ref
+          image
+          description
+          helpImage
+          helpCategory
+          helpTitle
+          helpDescription
+          legalImage
+          legalCategory
+          legalTitle
+          legalDescription
+          dox
+          isComplete
+          isTopLevel
+          isArray
+          businessIntelligence
+          userId
+          lenderId
+          createdAt
+          updatedAt
+        }
+        ArrayForm {
+          id
+          name
+          code
+          ref
+          image
+          description
+          helpImage
+          helpCategory
+          helpTitle
+          helpDescription
+          legalImage
+          legalCategory
+          legalTitle
+          legalDescription
+          dox
+          isComplete
+          isTopLevel
+          isArray
+          businessIntelligence
+          userId
+          lenderId
+          createdAt
+          updatedAt
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const formsByLenderId = /* GraphQL */ `
+  query FormsByLenderId(
+    $lenderId: String
+    $name: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelFormFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    formsByLenderId(
+      lenderId: $lenderId
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        code
+        ref
+        image
+        description
+        helpImage
+        helpCategory
+        helpTitle
+        helpDescription
+        legalImage
+        legalCategory
+        legalTitle
+        legalDescription
+        dox
+        isComplete
+        isTopLevel
+        isArray
+        businessIntelligence
+        userId
+        lenderId
+        Field {
+          nextToken
+        }
+        Subform {
+          nextToken
+        }
+        ArrayForm {
+          nextToken
         }
         createdAt
         updatedAt

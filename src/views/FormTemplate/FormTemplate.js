@@ -5,7 +5,15 @@ import classnames from "classnames";
 //AWS Amplify GraphQL libraries
 import { API, graphqlOperation } from 'aws-amplify';
 import { getForm, fieldsByForm, formsByForm, listSubformFormJoins } from '../../graphql/queries';
-import { updateForm as updateFormMutation } from '../../graphql/mutations';
+import { listArrayFormsAndFields } from '../../graphql/customQueries';
+import { 
+  updateForm as updateFormMutation,
+  createForm as createFormMutation,
+  createArrayFormJoin as createArrayFormJoinMutation, 
+  createFieldFormJoin as createFieldFormJoinMutation,
+  deleteForm as deleteFormMutation,
+  deleteArrayFormJoin as deleteArrayFormJoinMutation,
+} from '../../graphql/mutations';
 
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
@@ -15,6 +23,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Checkbox from "@material-ui/core/Checkbox";
 import NavPills from "components/NavPills/NavPills.js";
+import Pagination from "components/Pagination/Pagination.js";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 // core components
@@ -26,6 +35,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import SevenAField from 'components/SevenAField/SevenAField'
+import Accordion from "components/Accordion/Accordion.js";
 
 // @material-ui/icons
 import Edit from "@material-ui/icons/Edit";
@@ -34,6 +44,8 @@ import Info from "@material-ui/icons/Info";
 import Gavel from "@material-ui/icons/Gavel";
 import HelpOutline from "@material-ui/icons/HelpOutline";
 import Dashboard from "@material-ui/icons/Dashboard";
+import Add from "@material-ui/icons/AddCircle";
+import Cancel from "@material-ui/icons/Cancel";
 
 const styles = {
   cardCategoryWhite: {
@@ -64,19 +76,21 @@ export default function FormTemplate() {
  
     const formId = history.location.state.formId
     const [form, setForm] = useState(initialFormState)
-    //const [order, setOrder] = useState(0)
     const [parentFormId, setParentFormId] = useState('')
     const [fields, setFields] = useState([])
     const [subforms, setSubforms] = useState([])
     const [incompleteSubforms, setIncompleteSubforms] = useState([])
     const [siblingForms, setSiblingForms] = useState([])
+    const [arrayForms, setArrayForms] = useState([])
     const [loading, setLoading] = useState(true)
+
     
 
     useEffect(() => {
       fetchForm()
       fetchFamilyForms()
       fetchSubforms()
+      fetchArrayForms()
       fetchFields()      
     }, [formId]);
 
@@ -129,6 +143,14 @@ export default function FormTemplate() {
       });       
       setSubforms(formsFromAPI.data.formsByForm.items)        
       setIncompleteSubforms(formsFromAPI.data.formsByForm.items.filter(form => !form.Subform.isComplete ))
+    } 
+
+    async function fetchArrayForms() {
+      const apiData = await API.graphql(graphqlOperation(listArrayFormsAndFields, {
+        filter: { FormID: { eq: formId }},
+      }));
+      //console.log('fetchArrayForms: apiData', apiData.data.listArrayFormJoins.items)
+      setArrayForms(apiData.data.listArrayFormJoins.items)        
     } 
 
     async function handlePublishForm() {      
@@ -213,7 +235,81 @@ export default function FormTemplate() {
       } else {
         history.push("/admin/formtemplate", { formId: parentFormId })
       }
-    }     
+    }           
+    
+    async function createArrayForm() {    
+      //add a copy of this form as a sibling
+      const newForm = { 
+        name: form.name,  
+        code: form.code,
+        ref: form.ref,	
+        image: '',
+        description: '',
+        helpImage: '',
+        helpCategory: '',
+        helpTitle: '',
+        helpDescription: '',
+        legalImage: '',
+        legalCategory: '',
+        legalTitle: '',
+        legalDescription: '',
+        dox: '',
+        isComplete: false,
+        isTopLevel: false,
+        isArray: false,
+        businessIntelligence: '',  
+        userId: form.userId,
+        lenderId: form.lenderId,
+      }
+      //console.log('createArrayForm: newForm', newForm)
+    
+      const apiData = await API.graphql({ query: createFormMutation, variables: { input: newForm } })
+      const newFormId = apiData.data.createForm.id      
+      //console.log('createArrayForm: newFormId', newFormId)
+      
+      const newFormOrder = arrayForms ? arrayForms.length+2 : 0
+      //console.log('createArrayForm: arrayForms', newFormOrder)
+
+      const newFormJoinFromAPI = await API.graphql(graphqlOperation(createArrayFormJoinMutation,{
+        input:{
+          FormID: formId, 
+          ArrayFormID: newFormId,
+          order: newFormOrder,
+        }
+      }))       
+      //console.log('createForm: newFormJoinFromAPI', newFormJoinFromAPI)    
+      //console.log('createForm: fields', fields)    
+      try
+      {  
+        fields.map(async(field)=>(
+            //await API.graphql(graphqlOperation(getStudent,{id: element.studentID})).then((data)=>console.log(data))
+            await API.graphql(graphqlOperation(createFieldFormJoinMutation,{
+              input:{
+                FormID: newFormId, 
+                FieldID: field.FieldID,
+                order: field.order,
+              }
+            })) 
+            //console.log('createArrayForm : field', field)
+          ))
+      } catch(err){ console.log('err',err ) }         
+      
+      //TODO add the new form and fields to the store
+      handleBackClick()
+    }
+
+    async function handleDeleteArrayForm(arrayFormId, arrayFormJoinId) {    
+      console.log('handleDeleteArrayForm : arrayFormId', arrayFormId)              
+        console.log('handleDeleteArrayForm : arrayFormJoinId', arrayFormJoinId) 
+        
+        //delete the join to the parent form
+        await API.graphql({ query: deleteArrayFormJoinMutation, variables: { input: { id: arrayFormJoinId } }})
+        //delete this form
+        await API.graphql({ query: deleteFormMutation, variables: { input: { id: arrayFormId } }})
+
+        //remove the form from the state
+        setArrayForms(arrayForms.filter(arrayForm => arrayForm.id !== arrayFormJoinId))      
+    }    
 
   return (
     <div>
@@ -232,20 +328,105 @@ export default function FormTemplate() {
                     tabButton: "Form",
                     tabIcon: Dashboard,
                     tabContent: (
+                      <>
                       <Card>
                         <CardHeader color="primary">
                           <h4 className={classes.cardTitleWhite}>{form.name}</h4>
-                          <p className={classes.cardCategoryWhite}>Form ID: {formId}</p>
-                          <p className={classes.cardCategoryWhite}>Parent Form ID: {parentFormId}</p>
+                          <p className={classes.cardCategoryWhite}>{form.isArray && "Is Array"}</p>
                         </CardHeader>
                         <CardBody>
-                          <GridContainer>
-                          {
+                          {  
+                          form.isArray ? (
+                            <Table className={classes.table}>                    
+                              <TableBody>
+                                <TableRow>                          
+                                <TableCell className={tableCellClasses}></TableCell>
+                                  {fields[0] && (<TableCell className={tableCellClasses}>{fields[0].Field.name}</TableCell>)}
+                                  {fields[1] && (<TableCell className={tableCellClasses}>{fields[1].Field.name}</TableCell>)}
+                                  <TableCell className={tableCellClasses}></TableCell>                                                 
+                                  <TableCell className={tableCellClasses}></TableCell>
+                                </TableRow>
+
+                                <TableRow className={classes.tableRow}>                              
+                                  <TableCell className={tableCellClasses}>
+                                  <Pagination
+                                    pages={[
+                                      { active: true, text: 1 },
+                                    ]}
+                                  />
+                                  </TableCell>
+                                  {fields[0] && (<TableCell className={tableCellClasses}>{form.id}</TableCell>)}                                    
+                                  {fields[1] && (<TableCell className={tableCellClasses}>1</TableCell>)}                                                                                         
+                                  <TableCell className={tableCellClasses}></TableCell>
+                                  <TableCell className={tableCellClasses}>
+                                      <Button
+                                        justIcon
+                                        color="success"
+                                        className={classes.marginRight}
+                                      >
+                                        <Check className={classes.icons} />
+                                      </Button>  
+                                  </TableCell>                                                                     
+                                </TableRow>
+
+                                {arrayForms.map((arrayForm, index) => (
+                                  <TableRow className={classes.tableRow} key={arrayForm.id}>                              
+                                  <TableCell className={tableCellClasses}>
+                                    <Pagination
+                                      pages={[
+                                        { active: true, text: index+2 },
+                                      ]}
+                                    />
+                                  </TableCell>
+                                  <TableCell className={tableCellClasses}>{arrayForm.ArrayFormID}</TableCell>                                    
+                                  <TableCell className={tableCellClasses}>{arrayForm.order}</TableCell>                                                                                       
+                                  
+                                  <TableCell>
+                                    <Button
+                                      onClick={() => handleDeleteArrayForm(arrayForm.ArrayFormID, arrayForm.id)}
+                                      justIcon
+                                      color="danger"
+                                      className={classes.marginRight}
+                                    >
+                                      <Cancel className={classes.icons} />
+                                    </Button>
+                                  </TableCell>
+                                  <TableCell className={tableCellClasses}>
+                                      <Button
+                                        justIcon
+                                        color="success"
+                                        className={classes.marginRight}
+                                      >
+                                        <Check className={classes.icons} />
+                                      </Button>  
+                                  </TableCell> 
+                                </TableRow>
+                                ))}
+                                
+                                <TableRow>                          
+                                  <TableCell className={tableCellClasses} colSpan={4}>Add another...</TableCell> 
+                                  <TableCell className={tableCellClasses}>
+                                    <Button
+                                      onClick={createArrayForm}
+                                      justIcon
+                                      color="info"
+                                      className={classes.marginRight}
+                                    >
+                                      <Add className={classes.icons} />
+                                    </Button>
+                                  </TableCell>                                                 
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          ) : (
+                            <GridContainer>
+                            {
                               fields.map(field => (
                                 <SevenAField key={field.Field.id} field={field.Field} />
                               ))
                             }                   
-                          </GridContainer>        
+                            </GridContainer>        
+                          )}                          
                         </CardBody>
                         <CardFooter>
                           <Button color="info" onClick={handleBackClick}>Back</Button>
@@ -253,6 +434,7 @@ export default function FormTemplate() {
                           {(incompleteSubforms.length > 0 || siblingForms.length > 0) && (<Button color="info" onClick={handleNextClick}>Next</Button>) }
                         </CardFooter>
                       </Card>
+                      </>
                     )
                   },
                   {

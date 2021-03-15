@@ -371,7 +371,7 @@ export default function FormTemplate() {
                       <Card>
                         <CardHeader color="primary">
                           <h4 className={classes.cardTitleWhite}>{form.name}</h4>
-                          <p className={classes.cardCategoryWhite}>{form.isArray && "Is Array"}</p>
+                          <p className={classes.cardCategoryWhite}>{form.description}</p>
                         </CardHeader>
                         <CardBody>
                           {  

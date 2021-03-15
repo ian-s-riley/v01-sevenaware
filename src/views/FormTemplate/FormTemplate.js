@@ -132,7 +132,7 @@ export default function FormTemplate() {
         query: fieldsByForm, 
         variables: { FormID: formId },
       }); 
-      //console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
+      console.log('fetchFields: formFromAPI', fieldsFromAPI)                     
       setFields(fieldsFromAPI.data.fieldsByForm.items)  
     } 
 
@@ -149,7 +149,7 @@ export default function FormTemplate() {
       const apiData = await API.graphql(graphqlOperation(listArrayFormsAndFields, {
         filter: { FormID: { eq: formId }},
       }));
-      //console.log('fetchArrayForms: apiData', apiData.data.listArrayFormJoins.items)
+      console.log('fetchArrayForms: apiData', apiData.data.listArrayFormJoins.items)
       setArrayForms(apiData.data.listArrayFormJoins.items)        
     } 
 
@@ -261,7 +261,8 @@ export default function FormTemplate() {
         userId: form.userId,
         lenderId: form.lenderId,
       }
-      //console.log('createArrayForm: newForm', newForm)
+      console.log('createArrayForm: formId', formId)
+      console.log('createArrayForm: newForm', newForm)
     
       const apiData = await API.graphql({ query: createFormMutation, variables: { input: newForm } })
       const newFormId = apiData.data.createForm.id      
@@ -276,9 +277,34 @@ export default function FormTemplate() {
           ArrayFormID: newFormId,
           order: newFormOrder,
         }
-      }))       
-      //console.log('createForm: newFormJoinFromAPI', newFormJoinFromAPI)    
-      //console.log('createForm: fields', fields)    
+      }))                    
+      const newFormJoinId = newFormJoinFromAPI.data.createArrayFormJoin.id
+      console.log('createForm: newFormJoinId', newFormJoinId)   
+
+      let newField = {
+        "Field": {
+            "id": fields[0].FieldID,
+            "name": fields[0].Field.name,
+            "fieldType": "Text",
+            "defaultValue": "",
+            "description": "",
+            "helpText": "",
+            "dox": "",
+            "code": fields[0].Field.code,
+            "image": "",
+            "label": "",
+            "lenderId": "-1",
+            "options": "",
+            "ref": "",
+            "size": 6,
+            "userId": "",
+            "value": ""
+        },
+        "order": newFormOrder,
+        "id": newFormJoinId
+      }
+
+      console.log('createForm: fields', fields)    
       try
       {  
         fields.map(async(field)=>(
@@ -295,20 +321,33 @@ export default function FormTemplate() {
       } catch(err){ console.log('err',err ) }         
       
       //TODO add the new form and fields to the store
-      handleBackClick()
+      const newArrayForm = {
+        "ArrayFormID": newFormId,
+        "id": newFormJoinId,
+        "order": 100,
+        "FormID": formId,
+        "ArrayForm": {
+            "Field": {
+                "items": [
+                  newField
+              ]
+            }
+        }
+    }
+      setArrayForms([...arrayForms, newArrayForm])
     }
 
     async function handleDeleteArrayForm(arrayFormId, arrayFormJoinId) {    
-      console.log('handleDeleteArrayForm : arrayFormId', arrayFormId)              
-        console.log('handleDeleteArrayForm : arrayFormJoinId', arrayFormJoinId) 
+      //console.log('handleDeleteArrayForm : arrayFormId', arrayFormId)              
+      //console.log('handleDeleteArrayForm : arrayFormJoinId', arrayFormJoinId) 
         
-        //delete the join to the parent form
-        await API.graphql({ query: deleteArrayFormJoinMutation, variables: { input: { id: arrayFormJoinId } }})
-        //delete this form
-        await API.graphql({ query: deleteFormMutation, variables: { input: { id: arrayFormId } }})
+      //delete the join to the parent form
+      await API.graphql({ query: deleteArrayFormJoinMutation, variables: { input: { id: arrayFormJoinId } }})
+      //delete this form
+      await API.graphql({ query: deleteFormMutation, variables: { input: { id: arrayFormId } }})
 
-        //remove the form from the state
-        setArrayForms(arrayForms.filter(arrayForm => arrayForm.id !== arrayFormJoinId))      
+      //remove the form from the state
+      setArrayForms(arrayForms.filter(arrayForm => arrayForm.id !== arrayFormJoinId))      
     }    
 
   return (
@@ -339,13 +378,6 @@ export default function FormTemplate() {
                           form.isArray ? (
                             <Table className={classes.table}>                    
                               <TableBody>
-                                <TableRow>                          
-                                <TableCell className={tableCellClasses}></TableCell>
-                                  {fields[0] && (<TableCell className={tableCellClasses}>{fields[0].Field.name}</TableCell>)}
-                                  {fields[1] && (<TableCell className={tableCellClasses}>{fields[1].Field.name}</TableCell>)}
-                                  <TableCell className={tableCellClasses}></TableCell>                                                 
-                                  <TableCell className={tableCellClasses}></TableCell>
-                                </TableRow>
 
                                 <TableRow className={classes.tableRow}>                              
                                   <TableCell className={tableCellClasses}>
@@ -355,8 +387,7 @@ export default function FormTemplate() {
                                     ]}
                                   />
                                   </TableCell>
-                                  {fields[0] && (<TableCell className={tableCellClasses}>{form.id}</TableCell>)}                                    
-                                  {fields[1] && (<TableCell className={tableCellClasses}>1</TableCell>)}                                                                                         
+                                  <TableCell className={tableCellClasses}>{formId}</TableCell>
                                   <TableCell className={tableCellClasses}></TableCell>
                                   <TableCell className={tableCellClasses}>
                                       <Button
@@ -378,8 +409,7 @@ export default function FormTemplate() {
                                       ]}
                                     />
                                   </TableCell>
-                                  <TableCell className={tableCellClasses}>{arrayForm.ArrayFormID}</TableCell>                                    
-                                  <TableCell className={tableCellClasses}>{arrayForm.order}</TableCell>                                                                                       
+                                  <TableCell className={tableCellClasses}>{arrayForm.ArrayFormID}</TableCell>                                                                                    
                                   
                                   <TableCell>
                                     <Button
@@ -404,7 +434,7 @@ export default function FormTemplate() {
                                 ))}
                                 
                                 <TableRow>                          
-                                  <TableCell className={tableCellClasses} colSpan={4}>Add another...</TableCell> 
+                                  <TableCell className={tableCellClasses} colSpan={2}>Add another...</TableCell> 
                                   <TableCell className={tableCellClasses}>
                                     <Button
                                       onClick={createArrayForm}

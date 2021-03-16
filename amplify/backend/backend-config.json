@@ -1,4 +1,12 @@
 {
+  "auth": {
+    "v01sevenaware33a62580": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  },
   "api": {
     "v01sevenaware": {
       "service": "AppSync",
@@ -9,26 +17,19 @@
             "authenticationType": "API_KEY",
             "apiKeyConfig": {
               "apiKeyExpirationDays": 365,
-              "description": "v01-sevenaware-key"
+              "description": "v02sevenawarekey"
             }
           },
-          "additionalAuthenticationProviders": []
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+              "userPoolConfig": {
+                "userPoolId": "authv01sevenaware33a62580"
+              }
+            }
+          ]
         }
       }
-    }
-  },
-  "auth": {
-    "v01sevenaware84249243": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "customAuth": false
-    }
-  },
-  "storage": {
-    "images": {
-      "service": "S3",
-      "providerPlugin": "awscloudformation"
     }
   }
 }

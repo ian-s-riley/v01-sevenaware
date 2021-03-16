@@ -27,9 +27,9 @@ function Admin(props) {
   const { ...rest } = props;
   // states and functions
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [miniActive, setMiniActive] = React.useState(false);
-  const [image, setImage] = React.useState(require("assets/img/sidebar-2.jpg"));
-  const [color, setColor] = React.useState("blue");
+  const [miniActive, setMiniActive] = React.useState(true);
+  const [image, setImage] = React.useState(require("assets/img/sidebar-1.jpg"));
+  const [color, setColor] = React.useState("white");
   const [bgColor, setBgColor] = React.useState("black");
   // const [hasImage, setHasImage] = React.useState(true);
   const [fixedClasses, setFixedClasses] = React.useState("dropdown");
@@ -182,18 +182,6 @@ function Admin(props) {
           </div>
         )}
         {getRoute() ? <Footer fluid /> : null}
-        <FixedPlugin
-          handleImageClick={handleImageClick}
-          handleColorClick={handleColorClick}
-          handleBgColorClick={handleBgColorClick}
-          color={color}
-          bgColor={bgColor}
-          bgImage={image}
-          handleFixedClick={handleFixedClick}
-          fixedClasses={fixedClasses}
-          sidebarMinimize={sidebarMinimize.bind(this)}
-          miniActive={miniActive}
-        />
       </div>
     </div>
   );

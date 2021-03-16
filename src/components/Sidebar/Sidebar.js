@@ -21,7 +21,7 @@ import AdminNavbarLinks from "components/Navbars/AdminNavbarLinks.js";
 
 import sidebarStyle from "assets/jss/material-dashboard-pro-react/components/sidebarStyle.js";
 
-import avatar from "assets/img/faces/avatar.jpg";
+import avatar from "assets/img/faces/marc.jpg";
 
 var ps;
 
@@ -364,7 +364,7 @@ class Sidebar extends React.Component {
               onClick={() => this.openCollapse("openAvatar")}
             >
               <ListItemText
-                primary={rtlActive ? "تانيا أندرو" : "Tania Andrew"}
+                primary={"John Doe"}
                 secondary={
                   <b
                     className={
@@ -384,52 +384,16 @@ class Sidebar extends React.Component {
               <List className={classes.list + " " + classes.collapseList}>
                 <ListItem className={classes.collapseItem}>
                   <NavLink
-                    to="#"
+                    to="/admin/user-page"
                     className={
                       classes.itemLink + " " + classes.userCollapseLinks
                     }
                   >
                     <span className={collapseItemMini}>
-                      {rtlActive ? "مع" : "MP"}
+                      MP
                     </span>
                     <ListItemText
-                      primary={rtlActive ? "ملفي" : "My Profile"}
-                      disableTypography={true}
-                      className={collapseItemText}
-                    />
-                  </NavLink>
-                </ListItem>
-                <ListItem className={classes.collapseItem}>
-                  <NavLink
-                    to="#"
-                    className={
-                      classes.itemLink + " " + classes.userCollapseLinks
-                    }
-                  >
-                    <span className={collapseItemMini}>
-                      {rtlActive ? "هوع" : "EP"}
-                    </span>
-                    <ListItemText
-                      primary={
-                        rtlActive ? "تعديل الملف الشخصي" : "Edit Profile"
-                      }
-                      disableTypography={true}
-                      className={collapseItemText}
-                    />
-                  </NavLink>
-                </ListItem>
-                <ListItem className={classes.collapseItem}>
-                  <NavLink
-                    to="#"
-                    className={
-                      classes.itemLink + " " + classes.userCollapseLinks
-                    }
-                  >
-                    <span className={collapseItemMini}>
-                      {rtlActive ? "و" : "S"}
-                    </span>
-                    <ListItemText
-                      primary={rtlActive ? "إعدادات" : "Settings"}
+                      primary="My Profile"
                       disableTypography={true}
                       className={collapseItemText}
                     />
